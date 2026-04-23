@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 
-<body class="font-sans leading-normal tracking-normal">
+<body class="font-sans leading-normal tracking-normal text-heading text-lg">
     {% if messages %}
         <div class='mx-auto max-w-5xl px-4 pt-4'>
             {% for message in messages %}
@@ -21,8 +21,14 @@
             {% endfor %}
         </div>
     {% endif %}
-    
+
     {% block base %}
     {% endblock %}
+
+
+    <script
+        src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.10/dist/dotlottie-wc.js"
+        type="module"
+    ></script>
 </body>
 </html>

@@ -2,6 +2,10 @@
 
 
 @theme {
+  --color-body: var(--color-neutral-500);
+  --color-body-subtle: var(--color-neutral-700);
+  --color-heading: var(--color-neutral-950);
+  
   /* BACKGROUND COLOR VARIABLES */
   /* used for neutral colors */
   --color-neutral-primary-soft: var(--color-white);
