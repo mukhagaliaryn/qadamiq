@@ -1,7 +1,7 @@
 <p align="center">
     <img 
         src="ui/static/images/logo.svg" 
-        alt="SecureGrade Logo" width="180" 
+        alt="SecureGrade Logo" width="240" 
     />
 </p>
 <h3 align="center">Qadam IQ</h3>
