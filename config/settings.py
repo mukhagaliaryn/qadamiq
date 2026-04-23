@@ -1,8 +1,11 @@
+from email.policy import default
 from pathlib import Path
 from decouple import config, Csv
 from django.utils.translation import gettext_lazy as _
 BASE_DIR = Path(__file__).resolve().parent.parent
 from django.contrib import messages
+from django.templatetags.static import static
+from django.urls import reverse_lazy
 
 
 SECRET_KEY = config('SECRET_KEY')
@@ -33,6 +36,10 @@ INSTALLED_APPS = [
     'ui',
     'core.apps.CoreConfig',
 
+    # apps...
+    'apps.main.apps.MainConfig',
+    'apps.dashboard.teacher.apps.TeacherConfig',
+    'apps.dashboard.learner.apps.LearnerConfig',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +59,7 @@ if DEBUG:
         'django_browser_reload.middleware.BrowserReloadMiddleware',
     ]
 
+AUTH_USER_MODEL = 'core.User'
 ROOT_URLCONF = 'config.urls'
 WSGI_APPLICATION = 'config.wsgi.application'
 
@@ -116,9 +124,11 @@ LOCALE_PATHS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Almaty'
 USE_I18N = True
 USE_TZ = True
+
+LANGUAGE_SESSION_KEY = 'django_language'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -145,4 +155,113 @@ MESSAGE_TAGS = {
     messages.WARNING: 'text-amber-500',
     messages.INFO: 'text-brand',
     messages.ERROR: 'text-destructive',
+}
+
+
+# Authentication settings
+# ----------------------------------------------------------------------------------------------------------------------
+LOGIN_URL = 'main:login'
+LOGIN_REDIRECT_URL = 'main:post-auth-redirect'
+LOGOUT_REDIRECT_URL = 'main:home'
+
+
+# Unfold settings
+# ----------------------------------------------------------------------------------------------------------------------
+# Unfold settings
+# ----------------------------------------------------------------------------------------------------------------------
+UNFOLD = {
+    'SITE_TITLE': config('SITE_NAME'),
+    'SITE_HEADER': config('SITE_NAME'),
+    'SITE_SUBHEADER': _('Dashboard'),
+
+    'LOGIN': {
+        'image': lambda request: static('images/admin-hero.svg'),
+        'title': _('Dashboard'),
+    },
+
+    'SITE_URL': '/',
+    'SITE_ICON': lambda request: static('images/icon.svg'),
+    'SITE_SYMBOL': 'speed',
+    'SITE_FAVICONS': [
+        {
+            'rel': 'icon',
+            'sizes': '32x32',
+            'type': 'image/svg+xml',
+            'href': lambda request: static('images/icon.svg'),
+        },
+    ],
+    'SHOW_LANGUAGES': True,
+
+    'SITE_DROPDOWN': [
+        {
+            'icon': 'home',
+            'title': _('Administration'),
+            'link': config('ADMIN_URL'),
+        },
+        {
+            'icon': 'open_in_new',
+            'title': _('Website'),
+            'link': config('WEBSITE_URL'),
+            'attrs': {
+                'target': '_blank',
+            },
+        },
+    ],
+
+    'SIDEBAR': {
+        'show_search': True,
+        'command_search': True,
+        'show_all_applications': True,
+
+        'navigation': [
+            {
+                'items': [
+                    {
+                        'title': _('Dashboard'),
+                        'icon': 'dashboard',
+                        'link': reverse_lazy('admin:index'),
+                        'badge': '3',
+                        'badge_variant': 'info',
+                        'badge_style': 'solid',
+                        'permission': lambda request: request.user.is_superuser,
+                    },
+                ],
+            },
+            {
+                'title': _('Account'),
+                'separator': True,
+                'collapsible': True,
+                'items': [
+                    {
+                        'title': _('Users'),
+                        'icon': 'people',
+                        'link': reverse_lazy('admin:core_user_changelist'),
+                    },
+                    {
+                        'title': _('Classrooms'),
+                        'icon': 'user_attributes',
+                        'link': reverse_lazy('admin:core_classroom_changelist'),
+                    },
+                    # ...
+                ],
+            },
+        ],
+    },
+
+    'BORDER_RADIUS': '12px',
+    'COLORS': {
+        'primary': {
+            '50': '#eef2ff',
+            '100': '#e0e7ff',
+            '200': '#c7d2fe',
+            '300': '#a5b4fc',
+            '400': '#818cf8',
+            '500': "#6366f1",
+            '600': '#4f46e5',
+            '700': '#4338ca',
+            '800': '#3730a3',
+            '900': '#312e81',
+            '950': '#1e1b4b',
+        },
+    },
 }

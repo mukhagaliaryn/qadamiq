@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Digital learning platform for primary school students' %}{% endblock %}
+
+{% block base %}
+<div class='mx-auto max-w-5xl px-4 py-12'>
+    <h1 class='text-4xl font-bold'>{% trans 'Digital learning platform for primary school students' %}</h1>
+    <p class='mt-4 text-lg'>{% trans 'Learn through play, grow step by step.' %}</p>
+
+    <div class='mt-8 flex gap-4'>
+        <a href='{% url 'main:login' %}' class='rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white'>
+            {% trans 'Login' %}
+        </a>
+        <a href='{% url 'main:register' %}' class='rounded-2xl bg-white px-5 py-3 font-semibold text-indigo-700 shadow'>
+            {% trans 'Register' %}
+        </a>
+    </div>
+</div>
+{% endblock %}

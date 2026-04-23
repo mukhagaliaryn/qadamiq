@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Settings' %}{% endblock %}
+
+{% block base %}
+<div class='mx-auto max-w-3xl px-4 py-10'>
+    <h1 class='mb-6 text-3xl font-bold'>{% trans 'Settings' %}</h1>
+
+    <form method='post' class='space-y-4 rounded-3xl bg-white p-6 shadow'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type='submit' class='rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white'>
+            {% trans 'Save settings' %}
+        </button>
+    </form>
+</div>
+{% endblock %}

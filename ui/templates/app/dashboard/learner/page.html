@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Learner dashboard' %}{% endblock %}
+
+{% block base %}
+<div class='mx-auto max-w-5xl px-4 py-10'>
+    <h1 class='text-4xl font-bold'>{% trans 'Learner dashboard' %}</h1>
+    <p class='mt-3 text-lg'>{% trans 'Welcome to the learner area.' %}</p>
+</div>
+{% endblock %}
