@@ -15,14 +15,14 @@ class ClassroomAdmin(ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
     fieldsets = (
-        (_('Main information'), {
+        (_('Основная информация'), {
             'fields': ('name', 'teacher', 'students'),
         }),
-        (_('Time signs'), {
+        (_('Время'), {
             'fields': ('created_at', 'updated_at'),
         }),
     )
 
     def student_count(self, obj):
         return obj.students.count()
-    student_count.short_description = _('Student count')
+    student_count.short_description = _('Количество учеников')

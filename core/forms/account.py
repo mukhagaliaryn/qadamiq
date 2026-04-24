@@ -10,17 +10,17 @@ User = get_user_model()
 # ----------------------------------------------------------------------------------------------------------------------
 class LoginForm(forms.Form):
     username_or_email = forms.CharField(
-        label=_('Username or email'),
+        label=_('Имя пользователя или адрес электронной почты'),
         max_length=150
     )
     password = forms.CharField(
-        label=_('Password'),
+        label=_('Пароль'),
         widget=forms.PasswordInput
     )
 
     error_messages = {
-        'invalid_login': _('Please enter a correct username/email and password.'),
-        'inactive': _('This account is inactive.'),
+        'invalid_login': _('Пожалуйста, введите правильное имя пользователя/адрес электронной почты и пароль.'),
+        'inactive': _('Эта учетная запись неактивна.'),
     }
 
     def __init__(self, request=None, *args, **kwargs):
@@ -79,9 +79,9 @@ class LoginForm(forms.Form):
 # RegisterForm
 # ----------------------------------------------------------------------------------------------------------------------
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField(label=_('Email'))
-    first_name = forms.CharField(label=_('First name'), max_length=150)
-    last_name = forms.CharField(label=_('Last name'), max_length=150)
+    email = forms.EmailField(label=_('Электронная почта'))
+    first_name = forms.CharField(label=_('Имя'), max_length=150)
+    last_name = forms.CharField(label=_('Фамилия'), max_length=150)
 
     class Meta:
         model = User
@@ -96,7 +96,7 @@ class RegisterForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data['email'].strip().lower()
         if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError(_('A user with this email already exists.'))
+            raise forms.ValidationError(_('Пользователь с таким адресом электронной почты уже существует.'))
         return email
 
     def _build_unique_username(self, email):
@@ -135,7 +135,7 @@ class RegisterForm(UserCreationForm):
 # ----------------------------------------------------------------------------------------------------------------------
 class ProfileForm(forms.ModelForm):
     remove_avatar = forms.BooleanField(
-        label=_('Remove avatar'),
+        label=_('Удалить аватар'),
         required=False
     )
 
@@ -153,14 +153,14 @@ class ProfileForm(forms.ModelForm):
         email = self.cleaned_data['email'].strip().lower()
         qs = User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk)
         if qs.exists():
-            raise forms.ValidationError(_('A user with this email already exists.'))
+            raise forms.ValidationError(_('Пользователь с таким адресом электронной почты уже существует.'))
         return email
 
     def clean_username(self):
         username = self.cleaned_data['username'].strip()
         qs = User.objects.filter(username__iexact=username).exclude(pk=self.instance.pk)
         if qs.exists():
-            raise forms.ValidationError(_('A user with this username already exists.'))
+            raise forms.ValidationError(_('Пользователь с таким именем пользователя уже существует.'))
         return username
 
     def save(self, commit=True):
@@ -176,17 +176,17 @@ class ProfileForm(forms.ModelForm):
 # ----------------------------------------------------------------------------------------------------------------------
 class PasswordChangeCustomForm(PasswordChangeForm):
     old_password = forms.CharField(
-        label=_('Current password'),
+        label=_('Текущий пароль'),
         strip=False,
         widget=forms.PasswordInput
     )
     new_password1 = forms.CharField(
-        label=_('New password'),
+        label=_('Новый пароль'),
         strip=False,
         widget=forms.PasswordInput
     )
     new_password2 = forms.CharField(
-        label=_('Confirm new password'),
+        label=_('Подтвердите новый пароль'),
         strip=False,
         widget=forms.PasswordInput
     )
@@ -194,11 +194,11 @@ class PasswordChangeCustomForm(PasswordChangeForm):
 
 class DeleteAccountForm(forms.Form):
     password = forms.CharField(
-        label=_('Password'),
+        label=_('Пароль'),
         widget=forms.PasswordInput
     )
     confirm = forms.BooleanField(
-        label=_('I understand that this action cannot be undone.'),
+        label=_('Я понимаю, что это действие не может быть отменено.'),
         required=True
     )
 
@@ -209,7 +209,7 @@ class DeleteAccountForm(forms.Form):
     def clean_password(self):
         password = self.cleaned_data['password']
         if not self.user.check_password(password):
-            raise forms.ValidationError(_('Incorrect password.'))
+            raise forms.ValidationError(_('Неверный пароль.'))
         return password
 
 

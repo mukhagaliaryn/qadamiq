@@ -172,11 +172,11 @@ LOGOUT_REDIRECT_URL = 'main:home'
 UNFOLD = {
     'SITE_TITLE': config('SITE_NAME'),
     'SITE_HEADER': config('SITE_NAME'),
-    'SITE_SUBHEADER': _('Dashboard'),
+    'SITE_SUBHEADER': _('Панель управления'),
 
     'LOGIN': {
         'image': lambda request: static('images/admin-hero.svg'),
-        'title': _('Dashboard'),
+        'title': _('Панель управления'),
     },
 
     'SITE_URL': '/',
@@ -190,7 +190,7 @@ UNFOLD = {
             'href': lambda request: static('images/icon.svg'),
         },
     ],
-    'SHOW_LANGUAGES': True,
+    # 'SHOW_LANGUAGES': True,
 
     'SITE_DROPDOWN': [
         {
@@ -217,7 +217,7 @@ UNFOLD = {
             {
                 'items': [
                     {
-                        'title': _('Dashboard'),
+                        'title': _('Панель управления'),
                         'icon': 'dashboard',
                         'link': reverse_lazy('admin:index'),
                         'badge': '3',
@@ -228,17 +228,17 @@ UNFOLD = {
                 ],
             },
             {
-                'title': _('Account'),
+                'title': _('Аккаунты'),
                 'separator': True,
                 'collapsible': True,
                 'items': [
                     {
-                        'title': _('Users'),
+                        'title': _('Пользователи'),
                         'icon': 'people',
                         'link': reverse_lazy('admin:core_user_changelist'),
                     },
                     {
-                        'title': _('Classrooms'),
+                        'title': _('Учебные классы'),
                         'icon': 'user_attributes',
                         'link': reverse_lazy('admin:core_classroom_changelist'),
                     },

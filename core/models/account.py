@@ -7,28 +7,28 @@ from django.utils.translation import gettext_lazy as _
 # ----------------------------------------------------------------------------------------------------------------------
 class User(AbstractUser):
     class Role(models.TextChoices):
-        ADMIN = 'admin', _('Admin')
-        TEACHER = 'teacher', _('Teacher')
-        LEARNER = 'learner', _('Learner')
+        ADMIN = 'admin', _('Администратор')
+        TEACHER = 'teacher', _('Преподаватель')
+        LEARNER = 'learner', _('Ученик')
 
     role = models.CharField(
-        _('Role'),
+        _('Роль'),
         max_length=20,
         choices=Role.choices,
         default=Role.LEARNER,
-        help_text=_('Shows the user\'s role in the system.')
+        help_text=_('Показывает роль пользователя в системе.')
     )
     avatar = models.ImageField(
-        _('Avatar'),
+        _('Аватар'),
         upload_to='users/avatars/',
         blank=True,
         null=True,
-        help_text=_('User profile picture.')
+        help_text=_('Фотография профиля пользователя.')
     )
 
     class Meta:
-        verbose_name = _('User')
-        verbose_name_plural = _('Users')
+        verbose_name = _('Пользователь')
+        verbose_name_plural = _('Пользователи')
 
     @property
     def full_name(self):

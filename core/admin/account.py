@@ -21,22 +21,22 @@ class UserAdmin(BaseUserAdmin, UFModelAdmin):
     add_form = UserCreationForm
 
     fieldsets = (
-        (_('Main information'), {
+        (_('Основная информация'), {
             'fields': ('username', 'password'),
         }),
-        (_('Personal information'), {
+        (_('Личная информация'), {
             'fields': ('first_name', 'last_name', 'email', 'role', 'avatar'),
         }),
-        (_('Permissions'), {
+        (_('Разрешения'), {
             'fields': ('is_active', 'is_staff', 'is_superuser'),
         }),
-        (_('Important times'), {
+        (_('Входы'), {
             'fields': ('last_login', 'date_joined'),
         }),
     )
 
     add_fieldsets = (
-        (_('Add a new user'), {
+        (_('Добавить нового пользователя'), {
             'classes': ('wide',),
             'fields': (
                 'username',
@@ -54,7 +54,7 @@ class UserAdmin(BaseUserAdmin, UFModelAdmin):
 
     def full_name_display(self, obj):
         return obj.full_name
-    full_name_display.short_description = _('Full name')
+    full_name_display.short_description = _('Полное имя')
 
     def avatar_preview(self, obj):
         if obj.avatar:
@@ -63,7 +63,7 @@ class UserAdmin(BaseUserAdmin, UFModelAdmin):
                 obj.avatar.url
             )
         return '—'
-    avatar_preview.short_description = _('Avatar')
+    avatar_preview.short_description = _('Аватар')
 
 
 admin.site.unregister(Group)

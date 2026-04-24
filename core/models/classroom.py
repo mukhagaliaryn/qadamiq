@@ -8,37 +8,37 @@ from django.utils.translation import gettext_lazy as _
 # ----------------------------------------------------------------------------------------------------------------------
 class Classroom(models.Model):
     name = models.CharField(
-        _('Class name'),
+        _('Название класса'),
         max_length=255,
-        help_text=_('For example: 3A, 4B or the preparatory group.')
+        help_text=_('Например: 3А, 4Б или подготовительная группа.')
     )
     teacher = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_('Teacher'),
+        verbose_name=_('Преподаватель'),
         on_delete=models.CASCADE,
         related_name='owned_classrooms',
-        help_text=_('The teacher in charge of this class.')
+        help_text=_('Учитель, отвечающий за этот класс.')
     )
     students = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        verbose_name=_('Students'),
+        verbose_name=_('Обучающиеся'),
         related_name='classrooms',
         blank=True,
-        help_text=_('Students enrolled in this class.')
+        help_text=_('Ученики обучающиеся в этом классе.')
     )
 
     created_at = models.DateTimeField(
-        _('Created at'),
+        _('Дата создания'),
         auto_now_add=True
     )
     updated_at = models.DateTimeField(
-        _('Updated at'),
+        _('Дата обновления'),
         auto_now=True
     )
 
     class Meta:
-        verbose_name = _('Classroom')
-        verbose_name_plural = _('Classrooms')
+        verbose_name = _('Класс')
+        verbose_name_plural = _('Учебные классы')
         ordering = ['name']
 
     def clean(self):
@@ -46,7 +46,7 @@ class Classroom(models.Model):
 
         if self.teacher and not self.teacher.is_teacher():
             raise ValidationError({
-                'teacher': _('The Class owner must be a teacher.')
+                'teacher': _('Владельцем класса должен быть преподаватель.')
             })
 
     def save(self, *args, **kwargs):

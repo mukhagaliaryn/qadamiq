@@ -2,25 +2,31 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans 'Digital learning platform for primary school students' %}{% endblock %}
+{% block title %}Цифровая обучающая платформа для учащихся начальной школы{% endblock %}
 
 {% block base %}
-<div class="min-h-screen grid items-center">
-    <div class="mx-auto max-w-7xl px-4 py-8 flex items-start">
-        <div class="flex-1">
-            <dotlottie-wc 
-                src="https://lottie.host/1d658ba0-e31b-42c7-a355-25927764ac66/l9XSYquem9.lottie"
-                style="width: 300px;height: 300px" 
-                autoplay 
-                loop
-                class="mx-auto"    
-            ></dotlottie-wc>
-            <h1 class="text-4xl font-black">{% trans 'Digital learning platform for primary school students' %}</h1>
-            <p class="mt-4 text-body">{% trans 'Learn through play, grow step by step.' %}</p>
+<div class="min-h-screen">
+    <div class="mx-auto max-w-7xl px-4 py-8 grid lg:flex gap-8 items-center">
+        <div class="flex-1 hidden lg:block">
+            <div>
+                <dotlottie-wc 
+                    src="https://lottie.host/1d658ba0-e31b-42c7-a355-25927764ac66/l9XSYquem9.lottie"
+                    style="width: 300px;height: 300px" 
+                    autoplay 
+                    loop
+                    class="mx-auto"    
+                ></dotlottie-wc>
+                <h1 class="text-4xl font-black">Цифровая обучающая платформа для учащихся начальной школы</h1>
+                <span class="mt-4 text-body">
+                    Учись в интерактивном формате, двигайся шаг за шагом. Понятные задания, постепенный прогресс и уверенные результаты.
+                </span>
+            </div>
         </div>
 
-        <div class="max-w-md w-full space-y-4">
+        <div class="w-full lg:max-w-md space-y-4">
             <div class="grid gap-2">
+                
+
                 <a 
                     href="{% url 'main:home' %}" 
                     class="flex w-full"
@@ -28,27 +34,151 @@
                     <img src="{% static 'images/logo.svg' %}" alt="Logo brand">
                 </a>
                 <span class="text-body text-center">
-                    {% trans 'Logo brand' %}
+                    Войди или создай аккаунт, чтобы начать обучение уже сейчас.
                 </span>
             </div>
 
 
-            <div class="grid gap-2">
+            <div class="grid gap-4">
                 <a 
                     href="{% url 'main:login' %}" 
-                    class='flex justify-center rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white'
+                    class="relative grid group"
+                >  
+                    <span class="absolute -bottom-2 w-full h-full rounded-2xl bg-brand-strong group-active:h-0"></span>
+                    <span class="
+                        relative w-full px-6 py-3 flex justify-center rounded-2xl bg-brand text-white font-semibold 
+                        group-hover:bg-brand-medium group-active:translate-y-1.5
+                        "
                     >
-                    {% trans 'Login' %}
+                        Авторизоваться
+                    </span>
                 </a>
-                <a
-                    href="{% url 'main:register' %}"
-                    class='flex justify-center rounded-2xl bg-white px-5 py-3 font-semibold text-indigo-700 shadow'
-                >
-                    {% trans 'Register' %}
+                <a 
+                    href="{% url 'main:register' %}" 
+                    class="relative grid group"
+                >  
+                    <span class="absolute -bottom-2 w-full h-full rounded-2xl bg-neutral-fivetenary group-active:h-0"></span>
+                    <span class="
+                        relative w-full px-6 py-3 flex justify-center rounded-2xl bg-neutral-primary border border-default font-semibold 
+                        group-hover:bg-neutral-secondary group-active:translate-y-1.5
+                        "
+                    >
+                        Зарегистрироваться
+                    </span>
                 </a>
             </div>
         </div>
     </div>
+
+    <section class="mx-auto max-w-7xl px-4 py-8 lg:py-16 space-y-8">
+        <div class="space-y-0 text-center">
+            <h2 class="text-3xl font-bold">
+                Основные возможности
+            </h2>
+            <span class="text-body">
+                Всё, что нужно для удобного и понятного обучения
+            </span>
+        </div>
+
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+            <!-- 1 -->
+            <div class="rounded-3xl bg-neutral-primary p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl">
+                <lord-icon
+                    src="https://cdn.lordicon.com/dgmcsyah.json"
+                    trigger="loop"
+                    style="width:80px;height:80px;"
+                >
+                </lord-icon>
+                <h3 class="text-xl font-semibold">
+                    Интерактивные задания
+                </h3>
+                <p class="mt-2 text-sm text-body">
+                    Задания помогают закрепить знания через практику: выбор ответа, сопоставление, логика и последовательность.
+                </p>
+            </div>
+
+            <!-- 2 -->
+            <div class="rounded-3xl bg-neutral-primary p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl">
+                <lord-icon
+                    src="https://cdn.lordicon.com/xowcggal.json"
+                    trigger="loop"
+                    style="width:80px;height:80px;"
+                >
+                </lord-icon>
+                <h3 class="text-lg font-semibold">
+                    Прогресс и результаты
+                </h3>
+                <p class="mt-2 text-sm text-body">
+                    Платформа отслеживает успехи ученика и показывает прогресс на каждом этапе обучения.
+                </p>
+            </div>
+
+            <!-- 3 -->
+            <div class="rounded-3xl bg-neutral-primary p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl">
+                <lord-icon
+                    src="https://cdn.lordicon.com/xuqkksyh.json"
+                    trigger="loop"
+                    style="width:80px;height:80px;"
+                >
+                </lord-icon>
+                <h3 class="text-lg font-semibold">
+                    Система уровней
+                </h3>
+                <p class="mt-2 text-sm text-body">
+                    Обучение построено по уровням, которые открываются по мере прохождения и помогают двигаться вперёд.
+                </p>
+            </div>
+
+            <!-- 4 -->
+            <div class="rounded-3xl bg-neutral-primary p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl">
+                <lord-icon
+                    src="https://cdn.lordicon.com/hnqamtrw.json"
+                    trigger="loop"
+                    style="width:80px;height:80px;"
+                >
+                </lord-icon>
+                <h3 class="text-lg font-semibold">
+                    Понятные материалы
+                </h3>
+                <p class="mt-2 text-sm text-body">
+                    Короткие и наглядные объяснения помогают быстро понять тему без перегрузки.
+                </p>
+            </div>
+
+            <!-- 5 -->
+            <div class="rounded-3xl bg-neutral-primary p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl">
+                <lord-icon
+                    src="https://cdn.lordicon.com/tdbbbqzo.json"
+                    trigger="loop"
+                    style="width:80px;height:80px;"
+                >
+                </lord-icon>
+                <h3 class="text-lg font-semibold">
+                    AI-помощник
+                </h3>
+                <p class="mt-2 text-sm text-body">
+                    Встроенный AI помогает разобраться в заданиях, подсказывает направление и поддерживает в процессе обучения.
+                </p>
+            </div>
+
+            <!-- 6 -->
+            <div class="rounded-3xl bg-neutral-primary p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl">
+                <lord-icon
+                    src="https://cdn.lordicon.com/olaidovj.json"
+                    trigger="loop"
+                    style="width:80px;height:80px;"
+                >
+                </lord-icon>
+                <h3 class="text-lg font-semibold">
+                    Мотивация и достижения
+                </h3>
+                <p class="mt-2 text-sm text-body">
+                    Ученик получает результаты и достижения за прохождение, что мотивирует двигаться дальше.
+                </p>
+            </div>
+        </div>
+    </section>
 </div>
 
 {% endblock %}

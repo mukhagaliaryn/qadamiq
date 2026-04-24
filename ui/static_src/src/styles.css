@@ -8,26 +8,17 @@
   
   /* BACKGROUND COLOR VARIABLES */
   /* used for neutral colors */
-  --color-neutral-primary-soft: var(--color-white);
   --color-neutral-primary: var(--color-white);
-  --color-neutral-primary-medium: var(--color-white);
-  --color-neutral-primary-strong: var(--color-white);
-  --color-neutral-secondary-soft: var(--color-neutral-50);
   --color-neutral-secondary: var(--color-neutral-50);
-  --color-neutral-secondary-medium: var(--color-neutral-50);
-  --color-neutral-secondary-strong: var(--color-neutral-50);
-  --color-neutral-secondary-strongest: var(--color-neutral-50);
-  --color-neutral-tertiary-soft: var(--color-neutral-100);
   --color-neutral-tertiary: var(--color-neutral-100);
-  --color-neutral-tertiary-medium: var(--color-neutral-100);
   --color-neutral-quaternary: var(--color-neutral-200);
-  --color-neutral-quaternary-medium: var(--color-neutral-200);
+  --color-neutral-fivetenary: var(--color-neutral-300);
 
   /* used for brand colors */
   --color-brand-softer: var(--color-indigo-50);
   --color-brand-soft: var(--color-indigo-100);
   --color-brand: var(--color-indigo-600);
-  --color-brand-medium: var(--color-indigo-200);
+  --color-brand-medium: var(--color-indigo-500);
   --color-brand-strong: var(--color-indigo-800);
 
   /* used for status colors */
