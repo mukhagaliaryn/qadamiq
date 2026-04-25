@@ -1,7 +1,50 @@
 from .account import User
-from .classroom import Classroom
+from .classroom import Classroom, ClassroomSubject
+from .learning import (
+    Subject,
+    Module,
+    Level,
+    Task,
+    TestTask,
+    TestQuestion,
+    TestAnswer,
+    MatchingTask,
+    MatchingPair,
+    MatchingGroup,
+    MatchingGroupItem,
+    OrderingTask,
+    OrderingItem,
+    AudioTask,
+)
+from .progress import (
+    SubjectProgress,
+    ModuleProgress,
+    LevelProgress,
+    TaskProgress,
+    AudioSubmission,
+)
 
 __all__ = [
     'User',
     'Classroom',
+    'ClassroomSubject',
+    'Subject',
+    'Module',
+    'Level',
+    'Task',
+    'TestTask',
+    'TestQuestion',
+    'TestAnswer',
+    'MatchingTask',
+    'MatchingPair',
+    'MatchingGroup',
+    'MatchingGroupItem',
+    'OrderingTask',
+    'OrderingItem',
+    'AudioTask',
+    'SubjectProgress',
+    'ModuleProgress',
+    'LevelProgress',
+    'TaskProgress',
+    'AudioSubmission',
 ]

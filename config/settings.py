@@ -226,7 +226,7 @@ UNFOLD = {
                 ],
             },
             {
-                'title': _('Аккаунты'),
+                'title': _('Аккаунты и классы'),
                 'separator': True,
                 'collapsible': True,
                 'items': [
@@ -239,6 +239,29 @@ UNFOLD = {
                         'title': _('Учебные классы'),
                         'icon': 'user_attributes',
                         'link': reverse_lazy('admin:core_classroom_changelist'),
+                    },
+                    # ...
+                ],
+            },
+            {
+                'title': _('Обучение'),
+                'separator': True,
+                'collapsible': True,
+                'items': [
+                    {
+                        'title': _('Предметы'),
+                        'icon': 'people',
+                        'link': reverse_lazy('admin:core_subject_changelist'),
+                    },
+                    {
+                        'title': _('Модули'),
+                        'icon': 'user_attributes',
+                        'link': reverse_lazy('admin:core_module_changelist'),
+                    },
+                    {
+                        'title': _('Задании'),
+                        'icon': 'user_attributes',
+                        'link': reverse_lazy('admin:core_task_changelist'),
                     },
                     # ...
                 ],
