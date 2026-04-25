@@ -1,3 +1,4 @@
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
@@ -62,7 +63,10 @@ class UserAdmin(BaseUserAdmin, UFModelAdmin):
                 '<img src=\'{}\' style=\'width: 36px; height: 36px; border-radius: 9999px; object-fit: cover;\' />',
                 obj.avatar.url
             )
-        return '—'
+        return format_html(
+            '<img src=\'{}\' style=\'width: 36px; height: 36px; border-radius: 9999px; object-fit: cover;\' />',
+            '/static/images/user-avatar.png'
+        )
     avatar_preview.short_description = _('Аватар')
 
 

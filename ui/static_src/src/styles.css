@@ -80,3 +80,9 @@
 
 
 @source "../../../**/*.{html,py,js}";
+
+@layer base {
+  * {
+    @apply outline-none focus:outline-2 focus:outline-brand;
+  }
+}

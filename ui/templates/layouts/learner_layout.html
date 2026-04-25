@@ -1,0 +1,26 @@
+{% extends 'layouts/dashboard_base.html' %}
+
+{% block dashboard_sidebar %}
+<div class="mb-4 rounded-2xl bg-white p-4">
+    <p class="text-sm text-body">Кабинет</p>
+    <h2 class="text-xl font-black">Ученика</h2>
+</div>
+
+<nav class="grid gap-2">
+    <a href="{% url 'learner:dashboard' %}" class="rounded-2xl px-4 py-3 font-semibold transition {% if request.resolver_match.url_name == 'dashboard' %}bg-brand text-white shadow{% else %}text-body hover:bg-white hover:text-brand{% endif %}">
+        Главная
+    </a>
+
+    <a href="{% url 'learner:modules' %}" class="rounded-2xl px-4 py-3 font-semibold transition {% if request.resolver_match.url_name == 'modules' %}bg-brand text-white shadow{% else %}text-body hover:bg-white hover:text-brand{% endif %}">
+        Модули
+    </a>
+
+    <a href="{% url 'learner:progress' %}" class="rounded-2xl px-4 py-3 font-semibold transition {% if request.resolver_match.url_name == 'progress' %}bg-brand text-white shadow{% else %}text-body hover:bg-white hover:text-brand{% endif %}">
+        Прогресс
+    </a>
+
+    <a href="{% url 'main:profile' %}" class="rounded-2xl px-4 py-3 font-semibold text-body transition hover:bg-white hover:text-brand">
+        Профиль
+    </a>
+</nav>
+{% endblock %}

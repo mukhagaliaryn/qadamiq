@@ -167,8 +167,6 @@ LOGOUT_REDIRECT_URL = 'main:home'
 
 # Unfold settings
 # ----------------------------------------------------------------------------------------------------------------------
-# Unfold settings
-# ----------------------------------------------------------------------------------------------------------------------
 UNFOLD = {
     'SITE_TITLE': config('SITE_NAME'),
     'SITE_HEADER': config('SITE_NAME'),
@@ -199,8 +197,8 @@ UNFOLD = {
             'link': config('ADMIN_URL'),
         },
         {
-            'icon': 'open_in_new',
-            'title': _('Website'),
+            'icon': 'account_circle',
+            'title': _('Аккаунт'),
             'link': config('WEBSITE_URL'),
             'attrs': {
                 'target': '_blank',

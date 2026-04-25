@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.utils.translation import gettext_lazy as _
-
 User = get_user_model()
 
 
@@ -211,16 +210,3 @@ class DeleteAccountForm(forms.Form):
         if not self.user.check_password(password):
             raise forms.ValidationError(_('Неверный пароль.'))
         return password
-
-
-# LanguageSettingsForm
-# ----------------------------------------------------------------------------------------------------------------------
-class LanguageSettingsForm(forms.Form):
-    language = forms.ChoiceField(
-        label=_('Language'),
-        choices=(
-            ('en', _('English')),
-            ('ru', _('Russian')),
-            ('kk', _('Kazakh')),
-        )
-    )

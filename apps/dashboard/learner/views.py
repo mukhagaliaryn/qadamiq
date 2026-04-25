@@ -1,16 +1,27 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
-from core.mixins import RoleRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from core.decorators import role_required
 
 
-class LearnerDashboardView(LoginRequiredMixin, RoleRequiredMixin, TemplateView):
-    template_name = 'app/dashboard/learner/page.html'
-    allowed_roles = ['learner']
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = 'Learner dashboard'
-        return context
+@login_required
+@role_required('learner')
+def dashboard_view(request):
+    return render(request, 'app/dashboard/learner/page.html', {
+        'page_title': 'Панель ученика',
+    })
 
 
-learner_dashboard_view = LearnerDashboardView.as_view()
+@login_required
+@role_required('learner')
+def modules_view(request):
+    return render(request, 'app/dashboard/learner/modules/page.html', {
+        'page_title': 'Модули',
+    })
+
+
+@login_required
+@role_required('learner')
+def progress_view(request):
+    return render(request, 'app/dashboard/learner/progress/page.html', {
+        'page_title': 'Прогресс',
+    })

@@ -1,0 +1,129 @@
+{% extends 'layouts/account_layout.html' %}
+
+{% block title %}Редактировать профиль{% endblock %}
+
+{% block account_layout %}
+<form method="post" enctype="multipart/form-data" class="rounded-3xl bg-neutral-primary p-6 border border-default">
+    {% csrf_token %}
+
+    <h1 class="text-3xl font-black">Редактировать профиль</h1>
+    <p class="mt-2 text-body">Обновите личные данные и изображение профиля.</p>
+
+    {% if form.non_field_errors %}
+        <div class="mt-6 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="mt-8 flex flex-col items-center gap-4 sm:flex-row">
+        <label for="{{ form.avatar.id_for_label }}" class="group relative cursor-pointer">
+            {% if request.user.avatar %}
+                <img id="avatarPreview" src="{{ request.user.avatar.url }}" alt="Avatar" class="h-28 w-28 rounded-full object-cover shadow">
+            {% else %}
+                <div id="avatarFallback" class="flex h-28 w-28 items-center justify-center rounded-full bg-brand text-4xl font-black text-white shadow">
+                    {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                </div>
+                <img id="avatarPreview" src="" alt="Avatar" class="hidden h-28 w-28 rounded-full object-cover shadow">
+            {% endif %}
+
+            <span class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-sm font-semibold text-white opacity-0 transition group-hover:opacity-100">
+                Изменить
+            </span>
+        </label>
+
+        <div class="space-y-2">
+            <input
+                type="file"
+                name="{{ form.avatar.name }}"
+                id="{{ form.avatar.id_for_label }}"
+                accept="image/*"
+                class="hidden"
+            >
+
+            <p class="font-semibold">Фото профиля</p>
+            <p class="text-sm text-body">Нажмите на аватар, чтобы загрузить новое изображение.</p>
+
+            {% if request.user.avatar %}
+                <label class="inline-flex items-center gap-2 text-sm text-body">
+                    <input type="checkbox" name="{{ form.remove_avatar.name }}" class="rounded border-default">
+                    Удалить текущее изображение
+                </label>
+            {% endif %}
+
+            {% for error in form.avatar.errors %}
+                <p class="text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="mt-8 grid gap-5 sm:grid-cols-2">
+        <div class="space-y-2">
+            <label for="{{ form.first_name.id_for_label }}" class="font-semibold">{{ form.first_name.label }}</label>
+            <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" value="{{ form.first_name.value|default_if_none:'' }}" class="w-full rounded-2xl border border-default bg-white px-4 py-3 outline-none focus:border-brand focus:ring-4 focus:ring-brand/15">
+            {% for error in form.first_name.errors %}<p class="text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="space-y-2">
+            <label for="{{ form.last_name.id_for_label }}" class="font-semibold">{{ form.last_name.label }}</label>
+            <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" value="{{ form.last_name.value|default_if_none:'' }}" class="w-full rounded-2xl border border-default bg-white px-4 py-3 outline-none focus:border-brand focus:ring-4 focus:ring-brand/15">
+            {% for error in form.last_name.errors %}<p class="text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="space-y-2">
+            <label for="{{ form.username.id_for_label }}" class="font-semibold">{{ form.username.label }}</label>
+            <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default_if_none:'' }}" class="w-full rounded-2xl border border-default bg-white px-4 py-3 outline-none focus:border-brand focus:ring-4 focus:ring-brand/15">
+            {% for error in form.username.errors %}<p class="text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="space-y-2">
+            <label for="{{ form.email.id_for_label }}" class="font-semibold">{{ form.email.label }}</label>
+            <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" value="{{ form.email.value|default_if_none:'' }}" class="w-full rounded-2xl border border-default bg-white px-4 py-3 outline-none focus:border-brand focus:ring-4 focus:ring-brand/15">
+            {% for error in form.email.errors %}<p class="text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+    </div>
+
+    <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+        <button type="submit" class="relative grid w-full sm:max-w-xs group">
+            <span class="absolute -bottom-2 h-full w-full rounded-2xl bg-brand-strong group-active:h-0"></span>
+            <span class="relative flex justify-center rounded-2xl bg-brand px-6 py-3 font-semibold text-white group-hover:bg-brand-medium group-active:translate-y-1.5">
+                Сохранить
+            </span>
+        </button>
+
+        <a href="{% url 'main:profile' %}" class="flex justify-center rounded-2xl bg-white px-6 py-3 font-semibold">
+            Отмена
+        </a>
+    </div>
+</form>
+
+<script>
+    const avatarInput = document.getElementById("{{ form.avatar.id_for_label }}");
+    const avatarPreview = document.getElementById("avatarPreview");
+    const avatarFallback = document.getElementById("avatarFallback");
+
+    if (avatarInput && avatarPreview) {
+        avatarInput.addEventListener("change", function () {
+            const file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                avatarPreview.src = event.target.result;
+                avatarPreview.classList.remove("hidden");
+
+                if (avatarFallback) {
+                    avatarFallback.classList.add("hidden");
+                }
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+{% endblock account_layout %}

@@ -1,18 +1,49 @@
-{% extends 'base.html' %}
-{% load i18n static %}
+{% extends 'layouts/account_layout.html' %}
 
-{% block title %}{% trans 'Profile' %}{% endblock %}
+{% block title %}Профиль{% endblock %}
 
-{% block base %}
-<div class='mx-auto max-w-3xl px-4 py-10'>
-    <h1 class='mb-6 text-3xl font-bold'>{% trans 'Profile' %}</h1>
+{% block account_layout %}
+<div class="rounded-3xl bg-neutral-primary p-6 border border-default">
+    <div class="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+        {% if user_profile.avatar %}
+            <img src="{{ user_profile.avatar.url }}" alt="Avatar" class="h-24 w-24 rounded-full object-cover shadow">
+        {% else %}
+            <div class="flex h-24 w-24 items-center justify-center rounded-full bg-brand text-4xl font-black text-white shadow">
+                {{ user_profile.first_name|first|default:user_profile.username|first|upper }}
+            </div>
+        {% endif %}
 
-    <form method='post' enctype='multipart/form-data' class='space-y-4 rounded-3xl bg-white p-6 shadow'>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type='submit' class='rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white'>
-            {% trans 'Save changes' %}
-        </button>
-    </form>
+        <div>
+            <h1 class="text-3xl font-black">{{ user_profile.full_name }}</h1>
+            <p class="text-body">{{ user_profile.email }}</p>
+            <p class="text-sm text-body">@{{ user_profile.username }}</p>
+        </div>
+    </div>
+
+    <div class="mt-8 grid sm:grid-cols-2">
+        <div class="rounded-2xl bg-white p-4">
+            <p class="text-base text-body">Имя</p>
+            <p class="font-semibold text-xl">{{ user_profile.first_name|default:'—' }}</p>
+        </div>
+        <div class="rounded-2xl bg-white p-4">
+            <p class="text-base text-body">Фамилия</p>
+            <p class="font-semibold text-xl">{{ user_profile.last_name|default:'—' }}</p>
+        </div>
+        <div class="rounded-2xl bg-white p-4">
+            <p class="text-base text-body">Email</p>
+            <p class="font-semibold text-xl">{{ user_profile.email }}</p>
+        </div>
+        <div class="rounded-2xl bg-white p-4">
+            <p class="text-base text-body">Роль</p>
+            <p class="font-semibold text-xl">{{ user_profile.get_role_display }}</p>
+        </div>
+    </div>
+
+    <a href="{% url 'main:profile-edit' %}" class="relative mt-8 grid w-full max-w-xs group">
+        <span class="absolute -bottom-2 h-full w-full rounded-2xl bg-brand-strong group-active:h-0"></span>
+        <span class="relative flex justify-center rounded-2xl bg-brand px-6 py-3 font-semibold text-white group-hover:bg-brand-medium group-active:translate-y-1.5">
+            Редактировать
+        </span>
+    </a>
 </div>
 {% endblock %}

@@ -1,11 +1,29 @@
-{% extends 'base.html' %}
-{% load i18n %}
+{% extends 'layouts/teacher_layout.html' %}
 
-{% block title %}{% trans 'Teacher dashboard' %}{% endblock %}
+{% block title %}Панель учителя{% endblock %}
 
-{% block base %}
-<div class='mx-auto max-w-5xl px-4 py-10'>
-    <h1 class='text-4xl font-bold'>{% trans 'Teacher dashboard' %}</h1>
-    <p class='mt-3 text-lg'>{% trans 'Welcome to the teacher area.' %}</p>
+{% block dashboard_content %}
+<div class="grid gap-6">
+    <section class="rounded-3xl bg-neutral-primary p-6 shadow">
+        <p class="text-body">Добро пожаловать, {{ request.user.first_name|default:request.user.username }}!</p>
+        <h1 class="mt-2 text-3xl font-black">Управление обучением</h1>
+    </section>
+
+    <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-3xl bg-neutral-primary p-6 shadow">
+            <p class="text-body">Классы</p>
+            <h2 class="mt-2 text-2xl font-black">0</h2>
+        </div>
+
+        <div class="rounded-3xl bg-neutral-primary p-6 shadow">
+            <p class="text-body">Ученики</p>
+            <h2 class="mt-2 text-2xl font-black">0</h2>
+        </div>
+
+        <div class="rounded-3xl bg-neutral-primary p-6 shadow">
+            <p class="text-body">Средний прогресс</p>
+            <h2 class="mt-2 text-2xl font-black">0%</h2>
+        </div>
+    </section>
 </div>
 {% endblock %}

@@ -1,17 +1,27 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
-
-from core.mixins import RoleRequiredMixin
-
-
-class TeacherDashboardView(LoginRequiredMixin, RoleRequiredMixin, TemplateView):
-    template_name = 'app/dashboard/teacher/page.html'
-    allowed_roles = ['teacher']
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = 'Teacher dashboard'
-        return context
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from core.decorators import role_required
 
 
-teacher_dashboard_view = TeacherDashboardView.as_view()
+@login_required
+@role_required('teacher')
+def dashboard_view(request):
+    return render(request, 'app/dashboard/teacher/page.html', {
+        'page_title': 'Панель учителя',
+    })
+
+
+@login_required
+@role_required('teacher')
+def classrooms_view(request):
+    return render(request, 'app/dashboard/teacher/classrooms/page.html', {
+        'page_title': 'Классы',
+    })
+
+
+@login_required
+@role_required('teacher')
+def students_view(request):
+    return render(request, 'app/dashboard/teacher/students/page.html', {
+        'page_title': 'Ученики',
+    })

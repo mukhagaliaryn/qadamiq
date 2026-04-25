@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block base %}
+<div class="min-h-screen grid items-center">
+    <div class="w-full md:max-w-lg py-8 px-4 space-y-8 mx-auto">
+        <a 
+            href="{% url 'main:home' %}"
+            class="w-full md:w-96 flex mx-auto"
+        >
+            <img src="{% static 'images/logo.svg' %}" class="w-full" alt="Logo brand">
+        </a>
+
+        <div class="relative">
+            {% block auth_layout %}
+            {% endblock auth_layout %}
+        </div>
+    </div>
+</div>
+{% endblock base %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block base %}
+<div class="min-h-screen">
+    <header class="sticky top-0 z-10 bg-neutral-primary border-b border-default">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 p-4">
+            <a href="{% url 'main:home' %}">
+                <img src="{% static 'images/logo.svg' %}" alt="Logo brand" class="h-12">
+            </a>
+
+            <a href="{% url 'learner:dashboard' %}" class="text-sm font-semibold text-body hover:text-brand">
+                Вернуться в кабинет
+            </a>
+        </div>
+    </header>
+
+    <div class="mx-auto max-w-7xl px-4 py-8">
+        <div class="grid gap-4 items-start lg:grid-cols-[320px_1fr]">
+            <aside class="rounded-3xl bg-neutral-primary p-4 border border-default">
+                <div class="mb-4 flex items-center gap-2 rounded-2xl bg-white p-2">
+                    {% if request.user.avatar %}
+                        <img src="{{ request.user.avatar.url }}" alt="Avatar" class="w-14 h-14 rounded-full object-cover">
+                    {% else %}
+                        <div class="flex w-14 h-14 items-center justify-center rounded-full bg-brand text-xl font-black text-white">
+                            {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                        </div>
+                    {% endif %}
+
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate font-bold">{{ request.user.full_name }}</p>
+                        <p class="truncate text-sm text-body">{{ request.user.email }}</p>
+                    </div>
+                </div>
+
+                <nav class="grid gap-2">
+                    <a 
+                        href="{% url 'main:profile' %}" 
+                        class="
+                            rounded-2xl px-4 py-3 font-semibold transition
+                            {% if request.resolver_match.url_name == 'profile' %}
+                                bg-brand text-white shadow
+                            {% else %}
+                                text-body hover:bg-white hover:text-brand
+                            {% endif %}
+                        "
+                    >
+                        Профиль
+                    </a>
+
+                    <a 
+                        href="{% url 'main:profile-edit' %}" 
+                        class="
+                            rounded-2xl px-4 py-3 font-semibold transition
+                            {% if request.resolver_match.url_name == 'profile-edit' %}
+                                bg-brand text-white shadow
+                            {% else %}
+                                text-body hover:bg-white hover:text-brand
+                            {% endif %}
+                        "
+                    >
+                        Редактировать профиль
+                    </a>
+
+                    <a 
+                        href="{% url 'main:settings' %}" 
+                        class="
+                            rounded-2xl px-4 py-3 font-semibold transition
+                            {% if request.resolver_match.url_name == 'settings' %}
+                                bg-brand text-white shadow
+                            {% else %}
+                                text-body hover:bg-white hover:text-brand
+                            {% endif %}
+                        "
+                    >
+                        Настройки
+                    </a>
+                </nav>
+            </aside>
+
+            <main>
+                {% block account_layout %}
+                {% endblock account_layout %}
+            </main>
+        </div>
+    </div>
+</div>
+{% endblock %}

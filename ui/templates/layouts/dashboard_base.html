@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block base %}
+<div class="min-h-screen">
+    <header class="sticky top-0 z-10 bg-neutral-primary border-b border-default">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 p-4">
+            <a href="{% url 'main:home' %}">
+                <img src="{% static 'images/logo.svg' %}" alt="Logo brand" class="h-12">
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="{% url 'main:profile' %}" class="flex items-center gap-3 rounded-2xl bg-neutral-primary px-3 py-2 shadow">
+                    {% if request.user.avatar %}
+                        <img src="{{ request.user.avatar.url }}" alt="Avatar" class="h-10 w-10 rounded-full object-cover">
+                    {% else %}
+                        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand font-black text-white">
+                            {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                        </span>
+                    {% endif %}
+
+                    <span class="hidden font-semibold sm:block">
+                        {{ request.user.full_name }}
+                    </span>
+                </a>
+
+                <form method="post" action="{% url 'main:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="rounded-2xl bg-neutral-primary px-4 py-3 font-semibold text-body shadow hover:text-brand">
+                        Выйти
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <div class="mx-auto max-w-7xl px-4 py-8">
+        <div class="grid gap-4 lg:grid-cols-[320px_1fr]">
+            <aside class="rounded-3xl bg-neutral-primary p-4 border border-default">
+                {% block dashboard_sidebar %}{% endblock %}
+            </aside>
+
+            <main class="min-w-0">
+                {% if messages %}
+                    <div class="mb-6 grid gap-3">
+                        {% for message in messages %}
+                            <div class="rounded-2xl bg-neutral-primary px-4 py-3 shadow">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block dashboard_content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+</div>
+{% endblock %}

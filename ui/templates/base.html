@@ -13,14 +13,39 @@
 
 <body class="font-sans leading-normal tracking-normal text-heading text-lg">
     {% if messages %}
-        <div class='mx-auto max-w-5xl px-4 pt-4'>
-            {% for message in messages %}
-                <div class='mb-3 rounded-2xl bg-white px-4 py-3 shadow'>
-                    {{ message }}
-                </div>
-            {% endfor %}
+        <div id="flash-messages" class="fixed top-5 left-1/2 -translate-x-1/2">
+
+                {% for message in messages %}
+                    <div class="flash-item rounded-2xl px-6 py-3 shadow flex gap-2 items-center bg-neutral-primary transition-all duration-500">
+                        <svg 
+                            class="w-8 h-8 {{ message.tags }}" 
+                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
+                                clip-rule="evenodd" />
+                        </svg>
+
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            <script>
+                document.querySelectorAll('.flash-item').forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.transform = 'translateY(0)';
+                        el.style.opacity = '1';
+                    }, 100 * index);
+
+                    setTimeout(() => {
+                        el.style.transform = 'translateY(-50px)';
+                        el.style.opacity = '0';
+                        setTimeout(() => el.remove(), 700);
+                    }, 5000);
+                });
+            </script>
         </div>
     {% endif %}
+
 
     {% block base %}
     {% endblock %}

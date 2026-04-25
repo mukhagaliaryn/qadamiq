@@ -13,6 +13,6 @@ urlpatterns = [
 
     # account views...
     path('account/profile/', account.profile_view, name='profile'),
-    path('account/security/', account.security_view, name='security'),
+    path('account/profile/edit/', account.profile_edit_view, name='profile-edit'),
     path('account/settings/', account.settings_view, name='settings'),
 ]
