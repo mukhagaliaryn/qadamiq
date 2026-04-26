@@ -123,10 +123,6 @@ class Level(TimeStampedModel):
         _('Название уровня'),
         max_length=255,
     )
-    description = models.TextField(
-        _('Описание'),
-        blank=True,
-    )
     is_active = models.BooleanField(
         _('Активен'),
         default=True,
@@ -365,15 +361,22 @@ class MatchingGroupItem(TimeStampedModel, ContentFieldsMixin):
 # Task: Ordering models
 # ----------------------------------------------------------------------------------------------------------------------
 class OrderingTask(TimeStampedModel):
-    task = models.OneToOneField(
+    task = models.ForeignKey(
         Task,
         verbose_name=_('Задание'),
         on_delete=models.CASCADE,
         related_name='ordering_task',
     )
+    description = models.TextField(
+        _('Описание'),
+    )
     is_active = models.BooleanField(
         _('Активно'),
-        default=False,
+        default=True,
+    )
+    order = models.PositiveIntegerField(
+        _('Порядок'),
+        default=0,
     )
 
     class Meta:

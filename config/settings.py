@@ -240,6 +240,11 @@ UNFOLD = {
                         'icon': 'user_attributes',
                         'link': reverse_lazy('admin:core_classroom_changelist'),
                     },
+                    {
+                        'title': _('Предметы классов'),
+                        'icon': 'user_attributes',
+                        'link': reverse_lazy('admin:core_classroomsubject_changelist'),
+                    },
                     # ...
                 ],
             },
@@ -250,22 +255,39 @@ UNFOLD = {
                 'items': [
                     {
                         'title': _('Предметы'),
-                        'icon': 'people',
+                        'icon': 'article',
                         'link': reverse_lazy('admin:core_subject_changelist'),
                     },
                     {
                         'title': _('Модули'),
-                        'icon': 'user_attributes',
+                        'icon': 'toc',
                         'link': reverse_lazy('admin:core_module_changelist'),
                     },
                     {
                         'title': _('Задании'),
-                        'icon': 'user_attributes',
+                        'icon': 'task',
                         'link': reverse_lazy('admin:core_task_changelist'),
                     },
                     # ...
                 ],
             },
+            {
+                'title': _('Прогресс'),
+                'separator': True,
+                'collapsible': True,
+                'items': [
+                    {
+                        'title': _('Прогресс по предмету'),
+                        'icon': 'overview',
+                        'link': reverse_lazy('admin:core_subjectprogress_changelist'),
+                    },
+                    {
+                        'title': _('Прогресс по модулю'),
+                        'icon': 'checklist',
+                        'link': reverse_lazy('admin:core_moduleprogress_changelist'),
+                    },
+                ]
+            }
         ],
     },
 

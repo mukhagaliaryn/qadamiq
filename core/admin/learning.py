@@ -1,6 +1,9 @@
 from django.contrib import admin
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin, TabularInline
+from unfold.admin import ModelAdmin, TabularInline, StackedInline
+from unfold.contrib.forms.widgets import WysiwygWidget
+
 from core.admin.mixins import LinkedAdminMixin
 from core.models import (
     Subject,
@@ -53,6 +56,11 @@ class SubjectAdmin(ModelAdmin):
     ordering = ('order', 'title')
     readonly_fields = ('created_at', 'updated_at')
     inlines = [ModuleInline]
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
 
 # ModuleAdmin inlines
@@ -86,8 +94,13 @@ class ModuleAdmin(LinkedAdminMixin, ModelAdmin):
     search_fields = ('title', 'description', 'subject__title')
     prepopulated_fields = {'slug': ('title',)}
     ordering = ('subject', 'order')
-    readonly_fields = ('created_at', 'updated_at', 'subject_link')
+    readonly_fields = ('subject_link',)
     inlines = [LevelInline]
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def subject_link(self, obj):
         return self.parent_link(obj, 'subject', label_field='title')
@@ -124,9 +137,9 @@ class TaskInline(LinkedAdminMixin, TabularInline):
 class LevelAdmin(LinkedAdminMixin, ModelAdmin):
     list_display = ('title', 'module', 'order', 'is_active', 'created_at')
     list_filter = ('module__subject', 'module', 'is_active', 'created_at')
-    search_fields = ('title', 'description', 'module__title', 'module__subject__title')
+    search_fields = ('title', 'module__title', 'module__subject__title')
     ordering = ('module', 'order')
-    readonly_fields = ('created_at', 'updated_at', 'module_link')
+    readonly_fields = ('module_link',)
     inlines = [TaskInline]
 
     def module_link(self, obj):
@@ -168,9 +181,7 @@ class MatchingTaskInline(LinkedAdminMixin, TabularInline):
         'is_active',
         'matching_task_link',
     )
-    readonly_fields = (
-        'matching_task_link',
-    )
+    readonly_fields = ('matching_task_link',)
     show_change_link = True
 
     def matching_task_link(self, obj):
@@ -183,15 +194,19 @@ class MatchingTaskInline(LinkedAdminMixin, TabularInline):
 class OrderingTaskInline(LinkedAdminMixin, TabularInline):
     model = OrderingTask
     extra = 0
-    max_num = 1
     fields = (
+        'order',
+        'description',
         'is_active',
         'ordering_task_link',
     )
-    readonly_fields = (
-        'ordering_task_link',
-    )
+    readonly_fields = ('ordering_task_link',)
     show_change_link = True
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def ordering_task_link(self, obj):
         return self.admin_link(obj, label=_('Подробнее'))
@@ -211,10 +226,13 @@ class AudioTaskInline(LinkedAdminMixin, TabularInline):
         'is_active',
         'audio_task_link',
     )
-    readonly_fields = (
-        'audio_task_link',
-    )
+    readonly_fields = ('audio_task_link',)
     show_change_link = True
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def audio_task_link(self, obj):
         return self.admin_link(obj, label=_('Подробнее'))
@@ -229,7 +247,12 @@ class TaskAdmin(LinkedAdminMixin, ModelAdmin):
     list_filter = ('task_type', 'level__module__subject', 'level__module', 'is_active')
     search_fields = ('title', 'instruction', 'content_text')
     ordering = ('level', 'order')
-    readonly_fields = ('created_at', 'updated_at', 'level_link')
+    readonly_fields = ('level_link',)
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def get_inlines(self, request, obj=None):
         if obj is None:
@@ -268,14 +291,15 @@ class TestQuestionInline(LinkedAdminMixin, TabularInline):
     fields = (
         'order',
         'content_text',
-        'content_image',
-        'content_audio',
         'question_link',
     )
-    readonly_fields = (
-        'question_link',
-    )
+    readonly_fields = ('question_link',)
     show_change_link = True
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def question_link(self, obj):
         return self.admin_link(obj, label=_('Подробнее'))
@@ -289,7 +313,7 @@ class TestTaskAdmin(LinkedAdminMixin, ModelAdmin):
     list_display = ('task', 'allow_multiple_answers', 'created_at')
     list_filter = ('allow_multiple_answers', 'created_at')
     search_fields = ('task__title',)
-    readonly_fields = ('created_at', 'updated_at', 'task_link')
+    readonly_fields = ('task_link',)
     inlines = [TestQuestionInline]
 
     def task_link(self, obj):
@@ -310,6 +334,11 @@ class TestAnswerInline(TabularInline):
         'is_correct',
     )
     show_change_link = True
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
 
 # TestQuestionAdmin
@@ -318,8 +347,13 @@ class TestQuestionAdmin(LinkedAdminMixin, ModelAdmin):
     list_display = ('test', 'content_text', 'order', 'created_at')
     list_filter = ('test', 'created_at')
     search_fields = ('content_text', 'test__task__title')
-    readonly_fields = ('created_at', 'updated_at', 'test_link')
+    readonly_fields = ('test_link',)
     inlines = [TestAnswerInline]
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def test_link(self, obj):
         return self.parent_link(obj, 'test', label_field='task')
@@ -336,13 +370,17 @@ class MatchingPairInline(LinkedAdminMixin, TabularInline):
     fields = (
         'order',
         'left_text',
-        'right_text',
+        'left_image',
+        'left_audio',
         'pair_link',
     )
-    readonly_fields = (
-        'pair_link',
-    )
+    readonly_fields = ('pair_link',)
     show_change_link = True
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def pair_link(self, obj):
         return self.admin_link(obj, label=_('Подробнее'))
@@ -405,11 +443,12 @@ class MatchingPairAdmin(LinkedAdminMixin, ModelAdmin):
     list_display = ('matching', 'left_text', 'right_text', 'order')
     list_filter = ('matching',)
     search_fields = ('left_text', 'right_text')
-    readonly_fields = (
-        'created_at',
-        'updated_at',
-        'matching_link',
-    )
+    readonly_fields = ('matching_link',)
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def matching_link(self, obj):
         return self.parent_link(obj, 'matching', label_field='task')
@@ -491,6 +530,11 @@ class OrderingItemInline(LinkedAdminMixin, TabularInline):
         'content_audio',
     )
     show_change_link = True
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
 
 # OrderingTaskAdmin
@@ -498,8 +542,13 @@ class OrderingItemInline(LinkedAdminMixin, TabularInline):
 class OrderingTaskAdmin(LinkedAdminMixin, ModelAdmin):
     list_display = ('task', 'created_at')
     search_fields = ('task__title',)
-    readonly_fields = ('created_at', 'updated_at', 'task_link')
+    readonly_fields = ('task_link',)
     inlines = [OrderingItemInline]
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def task_link(self, obj):
         return self.parent_link(obj, 'task', label_field='title')
@@ -513,7 +562,12 @@ class OrderingTaskAdmin(LinkedAdminMixin, ModelAdmin):
 class AudioTaskAdmin(LinkedAdminMixin, ModelAdmin):
     list_display = ('task', 'created_at')
     search_fields = ('task__title', 'content_text')
-    readonly_fields = ('created_at', 'updated_at', 'task_link')
+    readonly_fields = ('task_link',)
+    formfield_overrides = {
+        models.TextField: {
+            'widget': WysiwygWidget,
+        },
+    }
 
     def task_link(self, obj):
         return self.parent_link(obj, 'task', label_field='title')
