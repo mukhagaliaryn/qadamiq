@@ -1,0 +1,131 @@
+{% extends 'layouts/learner_layout.html' %}
+
+{% block title %}{{ level.title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="grid gap-6">
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <a href="{% url 'learner:module-detail' level.module.id %}" class="font-bold text-brand hover:underline">
+            ← Назад к модулю
+        </a>
+
+        <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+                <h1 class="text-3xl font-black text-heading">
+                    {{ level.title }}
+                </h1>
+
+                <p class="mt-2 text-body">
+                    {{ level.module.title }} · {{ level.module.subject.title }}
+                </p>
+            </div>
+
+            <div class="rounded-2xl bg-white px-5 py-4 border border-default">
+                <div class="font-semibold text-body">Прогресс уровня</div>
+                <div class="mt-1 text-4xl font-black text-heading">{{ progress_percent }}%</div>
+            </div>
+        </div>
+
+        <div class="mt-6 h-3 overflow-hidden rounded-full bg-neutral-tertiary">
+            <div
+                class="h-full rounded-full bg-brand"
+                style="width: {{ progress_percent }}%;"
+            ></div>
+        </div>
+    </section>
+
+    <section class="rounded-3xl bg-white p-6 border border-default">
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-black text-heading">Задания</h2>
+                <p class="mt-1 text-body">
+                    Выполните все задания уровня.
+                </p>
+            </div>
+
+            <span class="rounded-full bg-neutral-primary px-4 py-2 font-bold text-heading">
+                {{ completed_tasks }}/{{ total_tasks }}
+            </span>
+        </div>
+
+        <div class="mt-5 grid gap-3">
+            {% for item in task_items %}
+                <div class="flex items-center justify-between gap-4 rounded-2xl bg-neutral-primary p-4 border border-default {% if item.is_locked %}opacity-60{% endif %}">
+                    <div class="flex items-center gap-4">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-xl">
+                            {% if item.is_completed %}
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/imeqmosk.json"
+                                    trigger="hover"
+                                    style="width:64px;height:64px">
+                                </lord-icon>
+                            {% elif item.is_locked %}
+                                🔒
+                            {% else %}
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/hnqamtrw.json"
+                                    trigger="hover"
+                                    style="width:48px;height:48px">
+                                </lord-icon>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <div class="font-black text-heading">
+                                {{ item.task.order }}. {{ item.task.title }}
+                            </div>
+
+                            <div class="mt-1 flex flex-wrap gap-2">
+                                <span class="rounded-full bg-white px-3 py-1 text-base font-bold text-brand">
+                                    {{ item.task.get_task_type_display }}
+                                </span>
+
+                                {% if item.is_completed %}
+                                    <span class="rounded-full bg-emerald-200 px-3 py-1 text-base font-bold text-emerald-700">
+                                        Завершено
+                                    </span>
+                                {% elif item.is_current %}
+                                    <span class="rounded-full bg-blue-200 px-3 py-1 text-base font-bold text-blue-700">
+                                        Текущее
+                                    </span>
+                                {% elif item.is_locked %}
+                                    <span class="rounded-full bg-white px-3 py-1 text-base font-bold text-heading">
+                                        Закрыто
+                                    </span>
+                                {% else %}
+                                    <span class="rounded-full bg-white px-3 py-1 text-base font-bold text-heading">
+                                        Не начато
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if item.is_locked %}
+                        <span class="rounded-2xl bg-white px-5 py-3 font-bold text-body border border-default">
+                            Закрыто
+                        </span>
+                    {% else %}
+                        <a
+                            href="{% url 'learner:task-detail' item.task.id %}"
+                            class="rounded-2xl bg-brand px-5 py-3 font-bold text-white shadow"
+                        >
+                            {% if item.is_completed %}
+                                Открыть
+                            {% elif item.progress %}
+                                Продолжить
+                            {% else %}
+                                Начать
+                            {% endif %}
+                        </a>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="rounded-2xl bg-neutral-primary p-5 text-body">
+                    Задания пока не добавлены.
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

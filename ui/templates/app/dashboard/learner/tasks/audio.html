@@ -1,0 +1,370 @@
+{% extends 'layouts/learner_layout.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block dashboard_content %}
+<div
+    class="grid gap-6"
+    x-data="audioRecorder()"
+    data-completed="{{ is_completed_now|yesno:'true,false' }}"
+    data-saved-result="{{ is_saved_result|yesno:'true,false' }}"
+    x-init="init()"
+>
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <a href="{% url 'learner:level-detail' task.level.id %}" class="font-bold text-brand hover:underline">
+            ← Назад к уровню
+        </a>
+
+        <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+                <div class="inline-flex rounded-full bg-white px-4 py-2 font-bold text-brand border border-default">
+                    Аудиозапись
+                </div>
+
+                <h1 class="mt-4 text-3xl font-black text-heading">
+                    {{ task.title }}
+                </h1>
+
+                {% if task.instruction %}
+                    <div class="mt-2 text-body">
+                        {{ task.instruction|safe }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="rounded-2xl bg-white px-5 py-4 border border-default">
+                <div class="font-semibold text-body">Статус</div>
+                <div class="mt-1 text-xl font-black text-heading">
+                    {% if is_completed_now %}
+                        Завершено
+                    {% elif submission %}
+                        Чек-лист
+                    {% else %}
+                        Запись
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if result %}
+        <section class="rounded-3xl bg-green-50 p-6 border border-default">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h2 class="text-2xl font-black text-heading">
+                        Отлично! Аудиозадание выполнено
+                    </h2>
+                    <p class="mt-2 text-body">
+                        Аудиофайл сохранён, чек-лист заполнен.
+                    </p>
+                </div>
+
+                <a
+                    href="{% url 'learner:level-detail' task.level.id %}"
+                    class="rounded-2xl bg-brand px-5 py-3 font-bold text-white shadow"
+                >
+                    Продолжить
+                </a>
+            </div>
+        </section>
+
+        <section class="rounded-3xl bg-white p-6 border border-default">
+            <h2 class="text-2xl font-black text-heading">Результат</h2>
+
+            <div class="mt-5 grid gap-4">
+                <div class="rounded-2xl bg-neutral-primary p-4 border border-default">
+                    <div class="font-bold text-body">Аудиозапись</div>
+
+                    {% if result.submission %}
+                        <audio controls class="mt-3 w-full">
+                            <source src="{{ result.submission.audio_file.url }}">
+                        </audio>
+                    {% endif %}
+                </div>
+
+                <div class="rounded-2xl bg-neutral-primary p-4 border border-default">
+                    <div class="font-bold text-body">Чек-лист</div>
+
+                    <div class="mt-3 grid gap-2">
+                        <div class="flex justify-between gap-4 rounded-xl bg-white p-3 border border-default">
+                            <span>Звук понятный?</span>
+                            <strong>{{ result.answer_data.checklist.sound_clear|default:'—' }}</strong>
+                        </div>
+
+                        <div class="flex justify-between gap-4 rounded-xl bg-white p-3 border border-default">
+                            <span>Я выполнил(а) шаги по порядку?</span>
+                            <strong>{{ result.answer_data.checklist.steps_ordered|default:'—' }}</strong>
+                        </div>
+
+                        <div class="flex justify-between gap-4 rounded-xl bg-white p-3 border border-default">
+                            <span>Файл сохранился?</span>
+                            <strong>{{ result.answer_data.checklist.file_saved|default:'—' }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    {% if not is_completed_now %}
+        {% if not submission %}
+            <section class="rounded-3xl bg-white p-6 border border-default">
+                <h2 class="text-2xl font-black text-heading">Запишите аудиоответ</h2>
+                <p class="mt-1 text-body">
+                    Перед отправкой можно прослушать запись, удалить её и записать заново.
+                </p>
+
+                <div class="mt-6 grid gap-4">
+                    <div class="rounded-3xl bg-neutral-primary p-5 border border-default">
+                        <div class="flex flex-wrap gap-3">
+                            <button
+                                type="button"
+                                class="rounded-2xl bg-brand px-5 py-3 font-bold text-white shadow disabled:opacity-50"
+                                @click="startRecording()"
+                                :disabled="isRecording"
+                            >
+                                Начать запись
+                            </button>
+
+                            <button
+                                type="button"
+                                class="rounded-2xl bg-white px-5 py-3 font-bold text-danger border border-default disabled:opacity-50"
+                                @click="stopRecording()"
+                                :disabled="!isRecording"
+                            >
+                                Остановить
+                            </button>
+
+                            <button
+                                type="button"
+                                class="rounded-2xl bg-white px-5 py-3 font-bold text-brand border border-default disabled:opacity-50"
+                                @click="clearRecording()"
+                                :disabled="!audioUrl"
+                            >
+                                Удалить и записать заново
+                            </button>
+                        </div>
+
+                        <div class="mt-5">
+                            <div class="font-bold text-body">
+                                <span x-show="!isRecording && !audioUrl">Запись ещё не создана</span>
+                                <span x-show="isRecording">Идёт запись...</span>
+                                <span x-show="audioUrl && !isRecording">Запись готова к проверке</span>
+                            </div>
+
+                            <div class="mt-3 h-3 overflow-hidden rounded-full bg-white">
+                                <div
+                                    class="h-full rounded-full bg-brand transition-all"
+                                    :style="`width: ${isRecording ? 100 : audioUrl ? 100 : 0}%`"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <template x-if="audioUrl">
+                            <div class="mt-5 rounded-2xl bg-white p-4 border border-default">
+                                <div class="font-bold text-body">Прослушивание</div>
+                                <audio class="mt-3 w-full" controls :src="audioUrl"></audio>
+                            </div>
+                        </template>
+                    </div>
+
+                    <form
+                        method="post"
+                        enctype="multipart/form-data"
+                        class="rounded-3xl bg-white p-4 border border-default"
+                        x-ref="uploadForm"
+                        @submit="prepareFileBeforeSubmit($event)"
+                    >
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="upload_audio">
+                        <input type="file" name="audio_file" class="hidden" x-ref="audioInput" accept="audio/*">
+
+                        <button
+                            type="submit"
+                            class="w-full rounded-2xl bg-brand px-6 py-3 font-bold text-white shadow disabled:opacity-50"
+                            :disabled="!audioBlob"
+                        >
+                            Сохранить аудиозапись
+                        </button>
+                    </form>
+                </div>
+            </section>
+        {% else %}
+            <section class="rounded-3xl bg-white p-6 border border-default">
+                <h2 class="text-2xl font-black text-heading">Проверьте запись</h2>
+                <p class="mt-1 text-body">
+                    Прослушайте аудио и заполните чек-лист.
+                </p>
+
+                <div class="mt-5 rounded-2xl bg-neutral-primary p-4 border border-default">
+                    <audio controls class="w-full">
+                        <source src="{{ submission.audio_file.url }}">
+                    </audio>
+                </div>
+            </section>
+
+            <form method="post" class="rounded-3xl bg-white p-6 border border-default">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="checklist">
+
+                <h2 class="text-2xl font-black text-heading">Чек-лист</h2>
+                <p class="mt-1 text-body">
+                    Заполните чек-лист на платформе. На каждый вопрос ответьте «Да» или «Нет».
+                </p>
+
+                <div class="mt-5 grid gap-4">
+                    <div class="rounded-2xl bg-neutral-primary p-4 border border-default">
+                        <div class="font-bold text-heading">Звук понятный?</div>
+                        <div class="mt-3 flex gap-3">
+                            <label class="rounded-xl bg-white px-4 py-3 font-bold border border-default cursor-pointer">
+                                <input type="radio" name="sound_clear" value="Да" required>
+                                Да
+                            </label>
+                            <label class="rounded-xl bg-white px-4 py-3 font-bold border border-default cursor-pointer">
+                                <input type="radio" name="sound_clear" value="Нет" required>
+                                Нет
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl bg-neutral-primary p-4 border border-default">
+                        <div class="font-bold text-heading">Я выполнил(а) шаги по порядку?</div>
+                        <div class="mt-3 flex gap-3">
+                            <label class="rounded-xl bg-white px-4 py-3 font-bold border border-default cursor-pointer">
+                                <input type="radio" name="steps_ordered" value="Да" required>
+                                Да
+                            </label>
+                            <label class="rounded-xl bg-white px-4 py-3 font-bold border border-default cursor-pointer">
+                                <input type="radio" name="steps_ordered" value="Нет" required>
+                                Нет
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl bg-neutral-primary p-4 border border-default">
+                        <div class="font-bold text-heading">Файл сохранился?</div>
+                        <div class="mt-3 flex gap-3">
+                            <label class="rounded-xl bg-white px-4 py-3 font-bold border border-default cursor-pointer">
+                                <input type="radio" name="file_saved" value="Да" required>
+                                Да
+                            </label>
+                            <label class="rounded-xl bg-white px-4 py-3 font-bold border border-default cursor-pointer">
+                                <input type="radio" name="file_saved" value="Нет" required>
+                                Нет
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <button
+                        type="submit"
+                        class="rounded-2xl bg-brand px-6 py-3 font-bold text-white shadow"
+                    >
+                        Завершить задание
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
+
+<script>
+    function audioRecorder() {
+        return {
+            mediaRecorder: null,
+            chunks: [],
+            audioBlob: null,
+            audioUrl: null,
+            isRecording: false,
+
+            init() {
+                const isCompleted = this.$el.dataset.completed === "true";
+                const isSavedResult = this.$el.dataset.savedResult === "true";
+
+                if (isCompleted && !isSavedResult) {
+                    this.runConfetti();
+                }
+            },
+
+            async startRecording() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert("Ваш браузер не поддерживает запись аудио.");
+                    return;
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                this.chunks = [];
+                this.mediaRecorder = new MediaRecorder(stream);
+
+                this.mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        this.chunks.push(event.data);
+                    }
+                };
+
+                this.mediaRecorder.onstop = () => {
+                    this.audioBlob = new Blob(this.chunks, { type: "audio/webm" });
+                    this.audioUrl = URL.createObjectURL(this.audioBlob);
+
+                    stream.getTracks().forEach((track) => track.stop());
+                };
+
+                this.mediaRecorder.start();
+                this.isRecording = true;
+            },
+
+            stopRecording() {
+                if (!this.mediaRecorder) {
+                    return;
+                }
+
+                this.mediaRecorder.stop();
+                this.isRecording = false;
+            },
+
+            clearRecording() {
+                if (this.audioUrl) {
+                    URL.revokeObjectURL(this.audioUrl);
+                }
+
+                this.chunks = [];
+                this.audioBlob = null;
+                this.audioUrl = null;
+                this.mediaRecorder = null;
+            },
+
+            prepareFileBeforeSubmit(event) {
+                if (!this.audioBlob) {
+                    event.preventDefault();
+                    return;
+                }
+
+                const file = new File(
+                    [this.audioBlob],
+                    "audio-answer.webm",
+                    { type: "audio/webm" }
+                );
+
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+
+                this.$refs.audioInput.files = dataTransfer.files;
+            },
+
+            runConfetti() {
+                if (typeof confetti === "undefined") {
+                    return;
+                }
+
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.65 },
+                });
+            },
+        };
+    }
+</script>
+{% endblock %}

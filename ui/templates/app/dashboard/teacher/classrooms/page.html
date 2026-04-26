@@ -3,8 +3,135 @@
 {% block title %}Классы{% endblock %}
 
 {% block dashboard_content %}
-<section class="rounded-3xl bg-neutral-primary p-6 shadow">
-    <h1 class="text-3xl font-black">Классы</h1>
-    <p class="mt-2 text-body">Здесь учитель сможет создавать классы и управлять ими.</p>
-</section>
+<div class="grid gap-6">
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <h1 class="text-3xl font-black">Классы</h1>
+        <p class="mt-2 text-body">Создание классов, закрепление предметов и добавление учеников.</p>
+    </section>
+
+    <section class="grid items-start gap-6 xl:grid-cols-2">
+        <form method="post" action="{% url 'teacher:classroom-create' %}" class="rounded-3xl bg-neutral-primary p-6 border border-default">
+            {% csrf_token %}
+            <h2 class="text-xl font-black">Новый класс</h2>
+            <div class="mt-4 grid gap-2">
+                <label class="font-semibold" for="{{ classroom_form.name.id_for_label }}">Название</label>
+                {{ classroom_form.name }}
+            </div>
+            <button type="submit" class="mt-5 w-full rounded-2xl bg-brand px-5 py-3 font-semibold text-white shadow">Создать</button>
+        </form>
+
+        <form method="post" action="{% url 'teacher:classroom-subject-assign' %}" class="rounded-3xl bg-neutral-primary p-6 border border-default">
+            {% csrf_token %}
+            <h2 class="text-xl font-black">Закрепить предмет</h2>
+            <div class="mt-4 grid gap-4">
+                <div class="grid gap-2">
+                    <label class="font-semibold" for="{{ subject_form.classroom.id_for_label }}">Класс</label>
+                    {{ subject_form.classroom }}
+                </div>
+                <div class="grid gap-2">
+                    <label class="font-semibold" for="{{ subject_form.subject.id_for_label }}">Предмет</label>
+                    {{ subject_form.subject }}
+                </div>
+            </div>
+            <button type="submit" class="mt-5 w-full rounded-2xl bg-brand px-5 py-3 font-semibold text-white shadow">Закрепить</button>
+        </form>
+    </section>
+
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-black">Мои классы</h2>
+            <a
+                href="{% url 'teacher:classroom-students-attach' %}"
+                class="rounded-2xl bg-brand px-5 py-3 text-center font-semibold text-white shadow"
+            >
+                Добавить учеников
+            </a>
+        </div>
+        <div class="mt-6 grid gap-4">
+            {% for classroom in classrooms %}
+                <article class="rounded-3xl border border-default bg-white p-5">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                            <h3 class="text-xl font-black">{{ classroom.name }}</h3>
+                            <p class="mt-1 text-body">{{ classroom.students_count }} учеников · {{ classroom.subjects_count }} предметов</p>
+                        </div>
+                        
+                        <div class="relative" x-data="{ open: false }">
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-2 rounded-2xl bg-neutral-primary px-4 py-3 font-semibold text-brand shadow"
+                                @click="open = !open"
+                                @click.outside="open = false"
+                            >
+                                Әрекеттер
+                                <span class="text-xs">▾</span>
+                            </button>
+
+                            <div
+                                x-cloak
+                                x-show="open"
+                                x-transition
+                                class="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5"
+                            >
+                                <a
+                                    href="{% url 'teacher:students' %}?classroom={{ classroom.id }}"
+                                    class="block px-4 py-3 font-semibold cursor-pointer hover:bg-brand hover:text-neutral-primary"
+                                >
+                                    Оқушылар
+                                </a>
+
+                                <a
+                                    href="{% url 'teacher:classroom-update' classroom.id %}"
+                                    class="block px-4 py-3 font-semibold cursor-pointer hover:bg-brand hover:text-neutral-primary"
+                                >
+                                    Өзгерту
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'teacher:classroom-delete' classroom.id %}"
+                                    onsubmit="return confirm('Осы сыныпты өшіресіз бе?')"
+                                >
+                                    {% csrf_token %}
+                                    <button
+                                        type="submit"
+                                        class="block w-full px-4 py-3 text-left font-semibold cursor-pointer text-danger hover:bg-danger hover:text-neutral-primary"
+                                    >
+                                        Өшіру
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                        <div>
+                            <p class="font-semibold">Предметы</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                {% for item in classroom.active_subjects %}
+                                    <span class="rounded-2xl bg-neutral-primary px-3 py-2 border border-default font-semibold">{{ item.subject.title }}</span>
+                                {% empty %}
+                                    <span class="text-sm text-body">Предметтер әлі бекітілмеген.</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="font-semibold">Ученики</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                {% for student in classroom.students.all|slice:':8' %}
+                                    <span class="rounded-2xl bg-neutral-primary px-3 py-2 border border-default font-semibold">{{ student.full_name }}</span>
+                                {% empty %}
+                                    <span class="text-sm text-body">Ученики пока не добавлены.</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="rounded-2xl border border-default bg-white p-6 text-body">Пока нет классов.</div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
 {% endblock %}

@@ -415,7 +415,7 @@ class MatchingTaskAdmin(LinkedAdminMixin, ModelAdmin):
     list_display = ('task', 'mode', 'created_at')
     list_filter = ('mode', 'created_at')
     search_fields = ('task__title',)
-    readonly_fields = ('created_at', 'updated_at', 'task_link')
+    readonly_fields = ('task_link',)
     inlines = [MatchingPairInline, MatchingGroupInline]
 
     def get_inlines(self, request, obj=None):

@@ -1,10 +1,12 @@
 from django.urls import path
-from apps.dashboard.learner import views
+from .views import dashboard, modules, levels, tasks
 
 app_name = 'learner'
 
 urlpatterns = [
-    path('', views.dashboard_view, name='dashboard'),
-    path('modules/', views.modules_view, name='modules'),
-    path('progress/', views.progress_view, name='progress'),
+    path('', dashboard.dashboard_view, name='dashboard'),
+    path('modules/', modules.modules_view, name='modules'),
+    path('modules/<int:module_id>/', modules.module_detail_view, name='module-detail'),
+    path('levels/<int:level_id>/', levels.level_detail_view, name='level-detail'),
+    path('tasks/<int:task_id>/', tasks.task_detail_view, name='task-detail'),
 ]

@@ -1,0 +1,375 @@
+{% extends 'layouts/learner_layout.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block dashboard_content %}
+<div
+    class="grid gap-6"
+    x-data="sortableMatching()"
+    x-init="init()"
+    data-completed="{{ is_completed_now|yesno:'true,false' }}"
+    data-saved-result="{% if result and result.is_saved_result %}true{% else %}false{% endif %}"
+>
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <a href="{% url 'learner:level-detail' task.level.id %}" class="font-bold text-brand hover:underline">
+            ← Назад к уровню
+        </a>
+
+        <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-black text-heading">
+                        {{ task.title }}
+                    </h1>
+
+                    <div class="inline-flex rounded-full bg-white px-4 py-2 font-bold text-brand border border-default">
+                        Сопоставление
+                    </div>
+                </div>
+                {% if task.instruction %}
+                    <div class="mt-2 text-body">
+                        {{ task.instruction|safe }}
+                    </div>
+                {% else %}
+                    <p class="mt-2 text-body">
+                        Переместите блоки справа вверх и вниз и сопоставьте их с блоками слева.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    {% if result %}
+        <section class="rounded-3xl {% if result.is_correct %}bg-green-50{% else %}bg-yellow-50{% endif %} p-6 border border-default">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    {% if result.is_correct %}
+                        <h2 class="text-2xl font-black text-heading">Отлично! Задание выполнено</h2>
+                        <p class="mt-2 text-body">Все пары сопоставлены правильно.</p>
+                    {% else %}
+                        <h2 class="text-2xl font-black text-heading">Есть ошибки</h2>
+                        <p class="mt-2 text-body">Измените порядок блоков справа и проверьте еще раз.</p>
+                    {% endif %}
+                </div>
+
+                {% if result.is_correct %}
+                    <a
+                        href="{% url 'learner:level-detail' task.level.id %}"
+                        class="rounded-2xl bg-brand px-5 py-3 font-bold text-white shadow"
+                    >
+                        Продолжить
+                    </a>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if result.is_correct %}
+            <section class="rounded-3xl bg-white p-6 border border-default">
+                <h2 class="text-2xl font-black text-heading">Подробный результат</h2>
+                <p class="mt-1 text-body">
+                    Здесь показано, какие пары были сопоставлены правильно.
+                </p>
+
+                <div class="mt-5 grid gap-5">
+                    {% for item in result.result_items %}
+                        <div class="rounded-3xl p-5 border {% if item.is_correct %}bg-green-50 border-green-200{% else %}bg-red-50 border-red-200{% endif %}">
+                            <div class="mb-4 flex items-center justify-between gap-4">
+                                <h3 class="text-xl font-black text-heading">
+                                    Пара {{ forloop.counter }}
+                                </h3>
+
+                                {% if item.is_correct %}
+                                    <span class="rounded-full bg-white px-3 py-1 font-bold text-green-700">
+                                        Верно
+                                    </span>
+                                {% else %}
+                                    <span class="rounded-full bg-white px-3 py-1 font-bold text-red-700">
+                                        Неверно
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="grid gap-4 lg:grid-cols-2">
+                                <div>
+                                    <div class="mb-2 font-bold text-body">Левый блок</div>
+                                    <div class="rounded-2xl bg-white p-4 border border-default">
+                                        {% include 'app/dashboard/learner/tasks/partials/matching_content.html' with text=item.pair.left_text image=item.pair.left_image audio=item.pair.left_audio %}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="mb-2 font-bold text-body">Выбранный правый блок</div>
+
+                                    {% if item.selected_pair %}
+                                        <div class="rounded-2xl bg-white p-4 border border-default">
+                                            {% include 'app/dashboard/learner/tasks/partials/matching_content.html' with text=item.selected_pair.right_text image=item.selected_pair.right_image audio=item.selected_pair.right_audio %}
+                                        </div>
+                                    {% else %}
+                                        <div class="rounded-2xl bg-white p-4 border border-default text-body">
+                                            Ответ не выбран
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if not item.is_correct %}
+                                <div class="mt-4 rounded-2xl bg-white p-4 border border-default">
+                                    <div class="font-bold text-body">Правильный ответ</div>
+                                    <div class="mt-3">
+                                        {% include 'app/dashboard/learner/tasks/partials/matching_content.html' with text=item.pair.right_text image=item.pair.right_image audio=item.pair.right_audio %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if not result.is_correct %}
+            <section class="rounded-3xl bg-white p-6 border border-default">
+                <div class="flex gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand text-2xl text-white">
+                        ✨
+                    </div>
+
+                    <div>
+                        <h2 class="text-xl font-black text-heading">ИИ-помощник</h2>
+                        <p class="mt-2 text-body">
+                            Не спешите сразу исправлять неправильные пары. Сначала установите блоки, которые четко совпадают.
+                            Затем сравните остальные по значению, изображению или аудио.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+    {% endif %}
+
+    {% if not is_completed_now %}
+        <form method="post" class="grid gap-6" x-ref="form">
+            {% csrf_token %}
+
+            <section class="rounded-3xl bg-white">
+                <div class="flex items-center justify-between gap-4">
+                    
+                </div>
+
+                <div class="mt-6 grid gap-4 rounded-3xl border border-default overflow-hidden">
+                    {% for row in rows %}
+                        <div
+                            class="matching-row grid gap-4 bg-neutral-primary p-4 lg:grid-cols-[1fr_80px_1fr]"
+                            data-row-index="{{ forloop.counter0 }}"
+                            @dragover.prevent
+                            @drop.prevent="dropOnRow($el)"
+                            @dragenter.prevent="hoverRow = $el"
+                            :class="hoverRow === $el ? 'ring-4 ring-brand/30 bg-white' : ''"
+                        >
+                            <input
+                                type="hidden"
+                                name="pair_{{ row.pair.id }}"
+                                value="{{ row.option.id }}"
+                                data-hidden-answer
+                            >
+
+                            <div class="rounded-2xl bg-white">
+                                {% include 'app/dashboard/learner/tasks/partials/matching_content.html' with text=row.pair.left_text image=row.pair.left_image audio=row.pair.left_audio %}
+                            </div>
+
+                            <div class="hidden items-center justify-center text-3xl font-black text-brand lg:flex">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-grip-vertical-icon lucide-grip-vertical">
+                                    <circle cx="9" cy="12" r="1" />
+                                    <circle cx="9" cy="5" r="1" />
+                                    <circle cx="9" cy="19" r="1" />
+                                    <circle cx="15" cy="12" r="1" />
+                                    <circle cx="15" cy="5" r="1" />
+                                    <circle cx="15" cy="19" r="1" />
+                                </svg>
+                            </div>
+
+                            <div
+                                class="right-slot rounded-2xl bg-white transition"
+                                :class="activeRow === '{{ forloop.counter0 }}' ? 'ring-4 ring-brand/30' : ''"
+                            >
+                                <div
+                                    class="right-card cursor-grab rounded-2xl bg-neutral-primary p-4 border border-default transition hover:-translate-y-0.5 hover:bg-white hover:shadow active:cursor-grabbing"
+                                    draggable="true"
+                                    data-option-id="{{ row.option.id }}"
+                                    @dragstart="dragStart($el.closest('.matching-row'))"
+                                    @dragend="dragEnd()"
+                                >
+                                    <div class="mb-3 flex items-center justify-between gap-3">
+                                        <span class="rounded-full bg-white px-3 py-1 text-xs font-black text-brand">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-icon lucide-move">
+                                                <path d="M12 2v20" />
+                                                <path d="m15 19-3 3-3-3" />
+                                                <path d="m19 9 3 3-3 3" />
+                                                <path d="M2 12h20" />
+                                                <path d="m5 9-3 3 3 3" />
+                                                <path d="m9 5 3-3 3 3" />
+                                            </svg>
+                                        </span>
+                                    </div>
+
+                                    {% include 'app/dashboard/learner/tasks/partials/matching_content.html' with text=row.option.right_text image=row.option.right_image audio=row.option.right_audio %}
+                                </div>
+
+                                <div class="mt-3 grid grid-cols-2 gap-2 lg:hidden">
+                                    <button
+                                        type="button"
+                                        class="rounded-xl bg-white px-3 py-2 font-bold text-brand border border-default"
+                                        @click="moveUp($el.closest('.matching-row'))"
+                                    >
+                                        ↑
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="rounded-xl bg-white px-3 py-2 font-bold text-brand border border-default"
+                                        @click="moveDown($el.closest('.matching-row'))"
+                                    >
+                                        ↓
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="sticky bottom-4 rounded-3xl bg-white p-4 shadow-xl border border-default">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div class="font-semibold text-body">
+                        Реті дайын болса, тексеріңіз.
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="rounded-2xl bg-brand px-6 py-3 font-bold text-white shadow"
+                        @click="syncInputs()"
+                    >
+                        Проверить
+                    </button>
+                </div>
+            </section>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    function sortableMatching() {
+        return {
+            draggedRow: null,
+            activeRow: null,
+            hoverRow: null,
+
+            init() {
+                this.syncInputs();
+
+                const isCompleted = this.$el.dataset.completed === "true";
+                const isSavedResult = this.$el.dataset.savedResult === "true";
+
+                if (isCompleted && !isSavedResult) {
+                    this.runConfetti();
+                }
+            },
+
+            dragStart(row) {
+                this.draggedRow = row;
+                this.activeRow = row.dataset.rowIndex;
+                row.classList.add("opacity-50");
+            },
+
+            dragEnd() {
+                if (this.draggedRow) {
+                    this.draggedRow.classList.remove("opacity-50");
+                }
+
+                this.draggedRow = null;
+                this.activeRow = null;
+                this.syncInputs();
+            },
+
+            dropOnRow(targetRow) {
+                if (!this.draggedRow || this.draggedRow === targetRow) {
+                    this.hoverRow = null;
+                    return;
+                }
+
+                this.swapRightCards(this.draggedRow, targetRow);
+                this.hoverRow = null;
+                this.syncInputs();
+            },
+
+            swapRightCards(firstRow, secondRow) {
+                const firstSlot = firstRow.querySelector(".right-slot");
+                const secondSlot = secondRow.querySelector(".right-slot");
+
+                const firstCard = firstSlot.querySelector(".right-card");
+                const secondCard = secondSlot.querySelector(".right-card");
+
+                const firstPlaceholder = document.createElement("div");
+
+                firstSlot.replaceChild(firstPlaceholder, firstCard);
+                secondSlot.replaceChild(firstCard, secondCard);
+                firstSlot.replaceChild(secondCard, firstPlaceholder);
+
+                firstCard.classList.add("scale-105");
+                secondCard.classList.add("scale-105");
+
+                setTimeout(() => {
+                    firstCard.classList.remove("scale-105");
+                    secondCard.classList.remove("scale-105");
+                }, 160);
+            },
+
+            moveUp(row) {
+                const previousRow = row.previousElementSibling;
+
+                if (!previousRow) {
+                    return;
+                }
+
+                this.swapRightCards(row, previousRow);
+                this.syncInputs();
+            },
+
+            moveDown(row) {
+                const nextRow = row.nextElementSibling;
+
+                if (!nextRow) {
+                    return;
+                }
+
+                this.swapRightCards(row, nextRow);
+                this.syncInputs();
+            },
+
+            syncInputs() {
+                document.querySelectorAll(".matching-row").forEach((row) => {
+                    const hiddenInput = row.querySelector("[data-hidden-answer]");
+                    const rightCard = row.querySelector(".right-card");
+
+                    if (hiddenInput && rightCard) {
+                        hiddenInput.value = rightCard.dataset.optionId;
+                    }
+                });
+            },
+
+            runConfetti() {
+                if (typeof confetti === "undefined") {
+                    return;
+                }
+
+                confetti({
+                    particleCount: 140,
+                    spread: 80,
+                    origin: { y: 0.65 },
+                });
+            },
+        };
+    }
+</script>
+{% endblock %}

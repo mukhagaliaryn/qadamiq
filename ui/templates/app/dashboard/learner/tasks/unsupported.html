@@ -1,0 +1,21 @@
+{% extends 'layouts/learner_layout.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="grid gap-6">
+    <section class="rounded-3xl bg-neutral-primary p-6 shadow">
+        <a href="{% url 'learner:level-detail' task.level.id %}" class="text-sm font-bold text-brand hover:underline">
+            ← Назад к уровню
+        </a>
+
+        <h1 class="mt-4 text-3xl font-black text-heading">
+            {{ task.title }}
+        </h1>
+
+        <p class="mt-2 text-body">
+            Этот тип задания будет подключён на следующем этапе.
+        </p>
+    </section>
+</div>
+{% endblock %}

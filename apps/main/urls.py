@@ -10,6 +10,7 @@ urlpatterns = [
     path('auth/login/', auth.login_view, name='login'),
     path('auth/register/', auth.register_view, name='register'),
     path('auth/logout/', auth.logout_view, name='logout'),
+    path('auth/redirect/', auth.post_auth_redirect_view, name='post-auth-redirect'),
 
     # account views...
     path('account/profile/', account.profile_view, name='profile'),

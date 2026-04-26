@@ -286,6 +286,21 @@ UNFOLD = {
                         'icon': 'checklist',
                         'link': reverse_lazy('admin:core_moduleprogress_changelist'),
                     },
+                    {
+                        'title': _('Прогресс по уровню'),
+                        'icon': 'checklist',
+                        'link': reverse_lazy('admin:core_levelprogress_changelist'),
+                    },
+                    {
+                        'title': _('Прогресс по заданию'),
+                        'icon': 'checklist',
+                        'link': reverse_lazy('admin:core_taskprogress_changelist'),
+                    },
+                    {
+                        'title': _('Аудиоответы'),
+                        'icon': 'mic',
+                        'link': reverse_lazy('admin:core_audiosubmission_changelist'),
+                    },
                 ]
             }
         ],

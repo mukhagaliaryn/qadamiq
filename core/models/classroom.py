@@ -45,7 +45,7 @@ class Classroom(models.Model):
     def clean(self):
         super().clean()
 
-        if self.teacher and not self.teacher.is_teacher():
+        if self.teacher_id and not self.teacher.is_teacher():
             raise ValidationError({
                 'teacher': _('Владельцем класса должен быть преподаватель.')
             })

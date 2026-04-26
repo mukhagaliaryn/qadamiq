@@ -1,10 +1,124 @@
 {% extends 'layouts/teacher_layout.html' %}
+{% load static %}
 
 {% block title %}Ученики{% endblock %}
 
 {% block dashboard_content %}
-<section class="rounded-3xl bg-neutral-primary p-6 shadow">
-    <h1 class="text-3xl font-black">Ученики</h1>
-    <p class="mt-2 text-body">Здесь будет список учеников выбранного класса.</p>
-</section>
+<div class="grid gap-6">
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <h1 class="text-3xl font-black">Ученики</h1>
+                <p class="mt-2 text-body">Список учеников, добавленных в ваши классы.</p>
+            </div>
+            <form method="get" class="flex gap-3">
+                <select name="classroom" class="rounded-2xl border border-default bg-white px-4 py-3 outline-none focus:border-brand">
+                    <option value="">Все классы</option>
+                    {% for classroom in classrooms %}
+                        <option value="{{ classroom.id }}" {% if selected_classroom and selected_classroom.id == classroom.id %}selected{% endif %}>{{ classroom.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="rounded-2xl bg-brand px-5 py-3 font-semibold text-white shadow cursor-pointer">Фильтр</button>
+            </form>
+        </div>
+    </section>
+
+        <div class="overflow-hidden rounded-2xl border border-default">
+            {% if students %}
+                <table class="w-full text-left">
+                    <thead class="bg-white text-body">
+                        <tr>
+                            <th class="px-4 py-3 font-semibold">Ученик</th>
+                            <th class="px-4 py-3 font-semibold">Қолданушының аты</th>
+                            <th class="px-4 py-3 font-semibold">Классы</th>
+                            <th class="px-4 py-3 font-semibold">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-default">
+                        {% for student in students %}
+                            <tr class="border-b border-black/5 transition hover:bg-neutral-primary">
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-4">
+                                        {% if student.avatar %}
+                                            <img
+                                                src="{{ student.avatar.url }}"
+                                                alt="{{ student.full_name|default:student.username }}"
+                                                class="h-12 w-12 rounded-2xl object-cover"
+                                            >
+                                        {% else %}
+                                            <img
+                                                src="{% static 'images/user-avatar.png' %}"
+                                                alt="{{ student.full_name|default:student.username }}"
+                                                class="h-12 w-12 rounded-2xl object-cover"
+                                            >
+                                        {% endif %}
+
+                                        <div class="min-w-0">
+                                            <div class="truncate font-bold">
+                                                {{ student.full_name|default:student.username }}
+                                            </div>
+                                            <div class="truncate text-body text-base">
+                                                {{ student.email|default:'Email не указан' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-4 text-body">
+                                    <span class="rounded-full bg-white px-3 py-1 font-semibold text-brand">
+                                        @{{ student.username }}
+                                    </span>
+                                </td>
+
+                                <td class="px-4 py-4">
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for classroom in student.classrooms.all %}
+                                            {% if classroom.teacher_id == request.user.id %}
+                                                <span class="inline-flex rounded-full bg-white px-3 py-1 font-semibold text-heading shadow-sm">
+                                                    {{ classroom.name }}
+                                                </span>
+                                            {% endif %}
+                                        {% empty %}
+                                            <span class="text-sm text-body">Класс жоқ</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-4 text-right">
+                                    {% if selected_classroom %}
+                                        <form
+                                            method="post"
+                                            action="{% url 'teacher:classroom-student-remove' selected_classroom.id student.id %}"
+                                            onsubmit="return confirm('Оқушыны осы сыныптан шығарасыз ба?')"
+                                        >
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                                            <button
+                                                type="submit"
+                                                class="flex gap-1 items-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-danger shadow-sm transition hover:bg-danger hover:text-white"
+                                            >
+                                                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                                                    height="24" fill="none" viewBox="0 0 24 24">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
+                                                </svg>
+                                                <span>Удалить</span>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-sm text-body">
+                                            Выберите класса
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="p-6 text-body">Ученики пока не добавлены.</div>
+            {% endif %}
+        </div>
+</div>
 {% endblock %}

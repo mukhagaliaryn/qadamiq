@@ -35,22 +35,12 @@
     </header>
 
     <div class="mx-auto max-w-7xl px-4 py-8">
-        <div class="grid gap-4 lg:grid-cols-[320px_1fr]">
+        <div class="grid items-start gap-4 lg:grid-cols-[320px_1fr]">
             <aside class="rounded-3xl bg-neutral-primary p-4 border border-default">
                 {% block dashboard_sidebar %}{% endblock %}
             </aside>
 
             <main class="min-w-0">
-                {% if messages %}
-                    <div class="mb-6 grid gap-3">
-                        {% for message in messages %}
-                            <div class="rounded-2xl bg-neutral-primary px-4 py-3 shadow">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
                 {% block dashboard_content %}{% endblock %}
             </main>
         </div>

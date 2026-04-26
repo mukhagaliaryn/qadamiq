@@ -1,0 +1,409 @@
+{% extends 'layouts/learner_layout.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block dashboard_content %}
+<div
+    class="grid gap-6"
+    x-data="orderingTask({ total: {{ rows|length }} })"
+    x-init="init()"
+    data-completed="{{ is_completed_now|yesno:'true,false' }}"
+    data-saved-result="{{ is_saved_result|yesno:'true,false' }}"
+>
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <a href="{% url 'learner:level-detail' task.level.id %}" class="font-bold text-brand hover:underline">
+            ← Назад к уровню
+        </a>
+
+        <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+                <div class="inline-flex rounded-full bg-white px-4 py-2 font-bold text-brand border border-default">
+                    Правильная последовательность
+                </div>
+
+                <h1 class="mt-4 text-3xl font-black text-heading">
+                    {{ task.title }}
+                </h1>
+
+                {% if task.instruction %}
+                    <div class="mt-2 text-body">
+                        {{ task.instruction|safe }}
+                    </div>
+                {% else %}
+                    <p class="mt-2 text-body">
+                        Расположите элементы в правильном порядке.
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="rounded-2xl bg-white px-5 py-4 border border-default">
+                <div class="font-semibold text-body">Последовательности</div>
+                <div class="mt-1 text-4xl font-black text-heading">{{ rows|length }}</div>
+            </div>
+        </div>
+    </section>
+
+    {% if result %}
+        <section class="rounded-3xl {% if result.is_correct %}bg-green-50{% else %}bg-yellow-50{% endif %} p-6 border border-default">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    {% if result.is_correct %}
+                        <h2 class="text-2xl font-black text-heading">Отлично! Задание выполнено</h2>
+                        <p class="mt-2 text-body">Все последовательности составлены правильно.</p>
+                    {% else %}
+                        <h2 class="text-2xl font-black text-heading">Есть ошибки</h2>
+                        <p class="mt-2 text-body">Проверьте порядок элементов и попробуйте ещё раз.</p>
+                    {% endif %}
+                </div>
+
+                {% if result.is_correct %}
+                    <a
+                        href="{% url 'learner:level-detail' task.level.id %}"
+                        class="rounded-2xl bg-brand px-5 py-3 font-bold text-white shadow"
+                    >
+                        Продолжить
+                    </a>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if not result.is_correct %}
+            <section class="rounded-3xl bg-white p-6 border border-default">
+                <div class="flex gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand text-2xl text-white">
+                        ✨
+                    </div>
+
+                    <div>
+                        <h2 class="text-xl font-black text-heading">ИИ-помощник</h2>
+                        <p class="mt-2 text-body">
+                            Сначала найдите первый и последний элемент последовательности. Затем расставьте средние элементы по смыслу, времени или логике действия.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+    {% endif %}
+
+    {% if result.is_correct %}
+        <section class="rounded-3xl bg-white p-6 border border-default">
+            <h2 class="text-2xl font-black text-heading">Результат</h2>
+
+            <div class="mt-5 grid gap-5">
+                {% for ordering_result in result.result_items %}
+                    <div class="rounded-3xl p-5 border {% if ordering_result.is_correct %}bg-green-50 border-green-200{% else %}bg-red-50 border-red-200{% endif %}">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <h3 class="text-xl font-black text-heading">
+                                    {{ forloop.counter }}. Последовательность
+                                </h3>
+
+                                {% if ordering_result.ordering_task.description %}
+                                    <div class="mt-2 text-body">
+                                        {{ ordering_result.ordering_task.description|safe }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if ordering_result.is_correct %}
+                                <span class="rounded-full bg-white px-3 py-1 font-bold text-green-700">
+                                    Верно
+                                </span>
+                            {% else %}
+                                <span class="rounded-full bg-white px-3 py-1 font-bold text-red-700">
+                                    Неверно
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-4 grid gap-3">
+                            {% for item_result in ordering_result.items %}
+                                <div class="flex items-start gap-4 rounded-2xl bg-white p-4 border border-default">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {% if item_result.is_correct %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} font-black">
+                                        {{ forloop.counter }}
+                                    </div>
+
+                                    <div class="min-w-0 flex-1">
+                                        {% include 'app/dashboard/learner/tasks/partials/matching_content.html' with text=item_result.item.content_text image=item_result.item.content_image audio=item_result.item.content_audio %}
+                                    </div>
+
+                                    {% if item_result.is_correct %}
+                                        <span class="font-black text-green-700">✓</span>
+                                    {% else %}
+                                        <span class="font-black text-red-700">×</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if not is_completed_now %}
+        <form method="post" class="grid gap-6">
+            {% csrf_token %}
+
+            <section class="rounded-3xl bg-white p-6 border border-default">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-heading">
+                            Последовательность <span x-text="current + 1"></span>/{{ rows|length }}
+                        </h2>
+                        <p class="mt-1 text-body">
+                            Әр тапсырманы жеке орындаңыз.
+                        </p>
+                    </div>
+
+                    <span class="rounded-full bg-neutral-primary px-4 py-2 font-bold text-heading">
+                        <span x-text="current + 1"></span>/{{ rows|length }}
+                    </span>
+                </div>
+
+                <div class="mt-6">
+                    {% for row in rows %}
+                        <div
+                            x-show="current === {{ forloop.counter0 }}"
+                            x-transition.opacity
+                            data-ordering-block="{{ row.ordering_task.id }}"
+                        >
+                            {% if row.ordering_task.description %}
+                                <div class="mb-5 rounded-2xl bg-neutral-primary p-5 text-body border border-default">
+                                    {{ row.ordering_task.description|safe }}
+                                </div>
+                            {% endif %}
+
+                            <div class="grid gap-3">
+                                {% for item in row.shuffled_items %}
+                                    <div
+                                        class="ordering-row flex items-start gap-4 rounded-2xl bg-neutral-primary p-4 border border-default transition cursor-move"
+                                        :class="hoverRow === $el ? 'ring-4 ring-brand/30 bg-white' : ''"
+                                        draggable="true"
+                                        @dragstart="dragStart($el)"
+                                        @dragend="dragEnd()"
+                                        @dragenter.prevent="hoverRow = $el"
+                                        @dragover.prevent
+                                        @dragleave="hoverRow = null"
+                                        @drop.prevent="dropOnRow($el)"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="order_{{ row.ordering_task.id }}[]"
+                                            value="{{ item.id }}"
+                                            data-hidden-order
+                                        >
+
+                                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-xl font-black text-brand border border-default">
+                                            ↕
+                                        </div>
+
+                                        <div class="min-w-0 flex-1 rounded-2xl bg-white p-4 border border-default">
+                                            {% include 'app/dashboard/learner/tasks/partials/matching_content.html' with text=item.content_text image=item.content_image audio=item.content_audio %}
+                                        </div>
+
+                                        <div class="grid gap-2 md:hidden">
+                                            <button
+                                                type="button"
+                                                class="rounded-xl bg-white px-3 py-2 font-bold text-brand border border-default"
+                                                @click="moveUp($el.closest('.ordering-row'))"
+                                            >
+                                                ↑
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                class="rounded-xl bg-white px-3 py-2 font-bold text-brand border border-default"
+                                                @click="moveDown($el.closest('.ordering-row'))"
+                                            >
+                                                ↓
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="sticky bottom-4 rounded-3xl bg-white p-4 shadow-xl border border-default">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div class="flex flex-wrap gap-2">
+                        {% for row in rows %}
+                            <button
+                                type="button"
+                                class="h-9 w-9 rounded-full border border-default text-sm font-black transition"
+                                :class="current === {{ forloop.counter0 }} ? 'bg-brand text-white' : 'bg-white text-body'"
+                                @click="goTo({{ forloop.counter0 }})"
+                            >
+                                {{ forloop.counter }}
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button
+                            type="button"
+                            class="rounded-2xl bg-neutral-primary px-5 py-3 font-bold text-brand border border-default disabled:opacity-40"
+                            :disabled="current === 0"
+                            @click="prev()"
+                        >
+                            Назад
+                        </button>
+
+                        <button
+                            type="button"
+                            class="rounded-2xl bg-brand px-5 py-3 font-bold text-white shadow"
+                            x-show="current < total - 1"
+                            @click="next()"
+                        >
+                            Далее
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="rounded-2xl bg-brand px-6 py-3 font-bold text-white shadow"
+                            x-show="current === total - 1"
+                            @click="syncInputs()"
+                        >
+                            Проверить
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    function orderingTask(config) {
+        return {
+            current: 0,
+            total: config.total,
+            draggedRow: null,
+            hoverRow: null,
+
+            init() {
+                this.syncInputs();
+
+                const isCompleted = this.$el.dataset.completed === "true";
+                const isSavedResult = this.$el.dataset.savedResult === "true";
+
+                if (isCompleted && !isSavedResult) {
+                    this.runConfetti();
+                }
+            },
+
+            next() {
+                if (this.current < this.total - 1) {
+                    this.current += 1;
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+            },
+
+            prev() {
+                if (this.current > 0) {
+                    this.current -= 1;
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+            },
+
+            goTo(index) {
+                this.current = index;
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            },
+
+            dragStart(row) {
+                this.draggedRow = row;
+                row.classList.add("opacity-50");
+            },
+
+            dragEnd() {
+                if (this.draggedRow) {
+                    this.draggedRow.classList.remove("opacity-50");
+                }
+
+                this.draggedRow = null;
+                this.hoverRow = null;
+                this.syncInputs();
+            },
+
+            dropOnRow(targetRow) {
+                if (!this.draggedRow || this.draggedRow === targetRow) {
+                    this.hoverRow = null;
+                    return;
+                }
+
+                this.moveRow(this.draggedRow, targetRow);
+                this.hoverRow = null;
+                this.syncInputs();
+            },
+
+            moveRow(draggedRow, targetRow) {
+                const parent = targetRow.parentNode;
+                const rows = Array.from(parent.querySelectorAll(".ordering-row"));
+                const draggedIndex = rows.indexOf(draggedRow);
+                const targetIndex = rows.indexOf(targetRow);
+
+                if (draggedIndex < targetIndex) {
+                    parent.insertBefore(draggedRow, targetRow.nextSibling);
+                } else {
+                    parent.insertBefore(draggedRow, targetRow);
+                }
+
+                draggedRow.classList.add("scale-[1.01]");
+                setTimeout(() => {
+                    draggedRow.classList.remove("scale-[1.01]");
+                }, 160);
+            },
+
+            moveUp(row) {
+                const previousRow = row.previousElementSibling;
+
+                if (!previousRow) {
+                    return;
+                }
+
+                row.parentNode.insertBefore(row, previousRow);
+                this.syncInputs();
+            },
+
+            moveDown(row) {
+                const nextRow = row.nextElementSibling;
+
+                if (!nextRow) {
+                    return;
+                }
+
+                row.parentNode.insertBefore(nextRow, row);
+                this.syncInputs();
+            },
+
+            syncInputs() {
+                document.querySelectorAll("[data-ordering-block]").forEach((block) => {
+                    block.querySelectorAll(".ordering-row").forEach((row) => {
+                        const input = row.querySelector("[data-hidden-order]");
+
+                        if (input) {
+                            input.value = input.value;
+                        }
+                    });
+                });
+            },
+
+            runConfetti() {
+                if (typeof confetti === "undefined") {
+                    return;
+                }
+
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.65 },
+                });
+            },
+        };
+    }
+</script>
+{% endblock %}

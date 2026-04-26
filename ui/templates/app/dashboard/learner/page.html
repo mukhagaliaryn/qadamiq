@@ -4,26 +4,156 @@
 
 {% block dashboard_content %}
 <div class="grid gap-6">
-    <section class="rounded-3xl bg-neutral-primary p-6 shadow">
-        <p class="text-body">Добро пожаловать, {{ request.user.first_name|default:request.user.username }}!</p>
-        <h1 class="mt-2 text-3xl font-black">Продолжим обучение?</h1>
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <h1 class="text-3xl font-black text-heading">Добро пожаловать, {{ request.user.first_name|default:request.user.username }}!</h1>
+        <p class="mt-2 text-body">
+            Здесь отображаются ваши классы, доступные предметы и общий прогресс обучения.
+        </p>
     </section>
 
-    <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="rounded-3xl bg-neutral-primary p-6 shadow">
-            <p class="text-body">Текущий модуль</p>
-            <h2 class="mt-2 text-2xl font-black">Пока не выбран</h2>
+    <section class="grid gap-4 md:grid-cols-4">
+        <div class="rounded-3xl bg-white p-5 border border-default">
+            <div class="font-semibold text-body">Классы</div>
+            <div class="mt-2 text-3xl font-black text-heading">{{ classrooms|length }}</div>
         </div>
 
-        <div class="rounded-3xl bg-neutral-primary p-6 shadow">
-            <p class="text-body">Прогресс</p>
-            <h2 class="mt-2 text-2xl font-black">0%</h2>
+        <div class="rounded-3xl bg-white p-5 border border-default">
+            <div class="font-semibold text-body">Предметы</div>
+            <div class="mt-2 text-3xl font-black text-heading">{{ total_subjects }}</div>
         </div>
 
-        <div class="rounded-3xl bg-neutral-primary p-6 shadow">
-            <p class="text-body">Достижения</p>
-            <h2 class="mt-2 text-2xl font-black">0</h2>
+        <div class="rounded-3xl bg-white p-5 border border-default">
+            <div class="font-semibold text-body">Задания</div>
+            <div class="mt-2 text-3xl font-black text-heading">
+                {{ completed_tasks }}/{{ total_tasks }}
+            </div>
         </div>
+
+        <div class="rounded-3xl bg-white p-5 border border-default">
+            <div class="font-semibold text-body">Общий прогресс</div>
+            <div class="mt-2 text-3xl font-black text-heading">{{ overall_progress }}%</div>
+
+            <div class="mt-4 h-3 overflow-hidden rounded-full bg-neutral-tertiary">
+                <div
+                    class="h-full rounded-full bg-brand"
+                    style="width: {{ overall_progress }}%;"
+                ></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="rounded-3xl bg-white p-6 border border-default">
+        <h2 class="font-black">Мои классы</h2>
+
+        {% if classrooms %}
+            <div class="mt-4 flex flex-wrap gap-2">
+                {% for classroom in classrooms %}
+                    <span class="rounded-2xl border border-default bg-neutral-primary px-4 py-2 font-black text-xl">
+                        {{ classroom.name }}
+                    </span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="mt-4 rounded-3xl bg-neutral-primary p-5 text-body">
+                Вы пока не добавлены ни в один класс.
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="grid gap-5">
+        <div>
+            <h2 class="text-xl font-black text-heading">Доступные предметы</h2>
+            <p class="mt-1 text-body">
+                Выберите открытый модуль и начните обучение.
+            </p>
+        </div>
+
+        {% if subject_items %}
+            <div class="grid gap-5">
+                {% for item in subject_items %}
+                    <article class="overflow-hidden rounded-3xl bg-[#eee7f8] p-5 shadow ring-1 ring-black/5">
+                        <div class="grid gap-6 xl:grid-cols-[280px_1fr]">
+                            <div class="w-full shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm p-6">
+                                {% if item.subject.cover_image %}
+                                    <img
+                                        src="{{ item.subject.cover_image.url }}"
+                                        alt="{{ item.subject.title }}"
+                                        class="h-full w-full object-cover"
+                                    >
+                                {% else %}
+                                    <div class="flex h-full w-full items-center justify-center">
+                                        <lord-icon
+                                            src="https://cdn.lordicon.com/yxsbonud.json"
+                                            trigger="in"
+                                            style="width:128px;height:128px">
+                                        </lord-icon>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-2 font-semibold text-base text-body">
+                                    <span>📘 Предмет</span>
+                                    <span>·</span>
+                                    <span>{{ item.modules_count }} модулей</span>
+                                    <span>·</span>
+                                    <span>{{ item.total_tasks }} заданий</span>
+                                </div>
+
+                                <h3 class="mt-3 text-2xl font-black text-heading">
+                                    {{ item.subject.title }}
+                                </h3>
+
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    {% for classroom in item.classrooms %}
+                                        <span class="rounded-full bg-white px-3 py-1 text-base font-bold text-heading shadow-sm">
+                                            {{ classroom.name }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mt-4 line-clamp-2 text-base leading-6 text-body">
+                                    {{ item.subject.description|safe|default:'Описание предмета пока не добавлено.' }}
+                                </div>
+
+                                <div class="mt-4 flex items-center gap-3">
+                                    {% if item.open_module %}
+                                        <a
+                                            href="{% url 'learner:module-detail' item.open_module.id %}"
+                                            class="rounded-xl border border-black/20 bg-white px-4 py-2 font-black text-heading shadow-sm transition hover:-translate-y-0.5 hover:shadow"
+                                        >
+                                            Открыть модуль
+                                        </a>
+                                    {% else %}
+                                        <span class="rounded-xl border border-black/10 bg-white px-4 py-2 font-black text-body">
+                                            Модулей пока нет
+                                        </span>
+                                    {% endif %}
+
+                                    <span class="font-bold text-brand">
+                                        {{ item.progress_percent }}%
+                                    </span>
+                                </div>
+
+                                <div class="mt-3 h-4 overflow-hidden rounded-full bg-white">
+                                    <div
+                                        class="h-full rounded-full bg-brand"
+                                        style="width: {{ item.progress_percent }}%;"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="rounded-3xl bg-white p-6 text-body shadow">
+                Доступные предметы пока не назначены.
+            </div>
+        {% endif %}
     </section>
 </div>
 {% endblock %}
+
+
+

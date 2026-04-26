@@ -1,0 +1,135 @@
+{% extends 'layouts/learner_layout.html' %}
+{% load static %}
+
+{% block title %}Модули{% endblock %}
+
+{% block dashboard_content %}
+<div class="grid gap-6">
+    <section class="rounded-3xl bg-neutral-primary p-6 border border-default">
+        <h1 class="text-3xl font-black text-heading">Модули</h1>
+        <p class="mt-2 text-body">
+            Продолжайте обучение с доступного модуля.
+        </p>
+    </section>
+
+    {% if subject_items %}
+        <section class="grid gap-5">
+            {% for item in subject_items %}
+                {% for module_item in item.module_items %}
+                    <article class="overflow-hidden rounded-3xl bg-[#eee7f8] p-5 shadow ring-1 ring-black/5 {% if module_item.is_locked %}opacity-60{% endif %}">
+                        <div class="grid gap-6 xl:grid-cols-[420px_1fr]">
+                            <div class="flex gap-5">
+                                <div class="h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm">
+                                    {% if module_item.module.cover_image %}
+                                        <img
+                                            src="{{ module_item.module.cover_image.url }}"
+                                            alt="{{ module_item.module.title }}"
+                                            class="h-full w-full object-cover {% if module_item.is_locked %}grayscale{% endif %}"
+                                        >
+                                    {% else %}
+                                        <div class="flex h-full w-full items-center justify-center">
+                                            {% if module_item.is_locked %}
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/yynwzrgh.json"
+                                                    trigger="hover"
+                                                    style="width:64px;height:64px">
+                                                </lord-icon>
+                                            {% else %}
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/yynwzrgh.json"
+                                                    trigger="hover"
+                                                    style="width:64px;height:64px">
+                                                </lord-icon>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 text-base font-semibold text-body">
+                                        <span>📚 Модуль</span>
+                                        <span>·</span>
+                                        <span>{{ module_item.module.levels.count }} уровней</span>
+                                        <span>·</span>
+
+                                        {% if module_item.is_completed %}
+                                            <span class="text-success">Завершено</span>
+                                        {% elif module_item.is_current %}
+                                            <span class="text-brand">Открыто</span>
+                                        {% else %}
+                                            <span>Закрыто</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <h2 class="mt-3 text-2xl font-black text-heading">
+                                        {{ module_item.module.order }}. {{ module_item.module.title }}
+                                    </h2>
+
+                                    <p class="mt-4 line-clamp-3 text-sm leading-6 text-body">
+                                        {{ module_item.module.description|default:'Описание модуля пока не добавлено.' }}
+                                    </p>
+
+                                    <div class="mt-4">
+                                        {% if module_item.is_locked %}
+                                            <span class="rounded-xl border border-black/10 bg-white px-4 py-2 font-black text-body shadow-sm">
+                                                🔒 Закрыто
+                                            </span>
+                                        {% else %}
+                                            <a
+                                                href="{% url 'learner:module-detail' module_item.module.id %}"
+                                                class="rounded-xl border border-black/20 bg-white px-4 py-2 font-black text-heading shadow-sm transition hover:-translate-y-0.5 hover:shadow"
+                                            >
+                                                Открыть модуль
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                                {% for level in module_item.module.levels.all|dictsort:'order'|slice:':3' %}
+                                    <div class="group overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-black/5">
+                                        <div class="relative flex h-36 items-center justify-center bg-neutral-primary text-5xl">
+                                            {% if module_item.is_locked %}
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/drdlomqk.json"
+                                                    trigger="in"
+                                                    style="width:64px;height:64px">
+                                                </lord-icon>
+                                            {% else %}
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/xuqkksyh.json"
+                                                    trigger="in"
+                                                    style="width:64px;height:64px">
+                                                </lord-icon>
+                                            {% endif %}
+
+                                            <span class="absolute right-3 top-2 rounded-full bg-white/90 px-3 py-1 text-base font-black text-heading">
+                                                {{ level.tasks.count }}-заданий
+                                            </span>
+                                        </div>
+
+                                        <div class="bg-heading p-4 text-white">
+                                            <h3 class="line-clamp-2 text-base font-black leading-6">
+                                                {{ level.title }}
+                                            </h3>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="rounded-2xl bg-white p-5 text-body shadow">
+                                        Уровни пока не добавлены.
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% endfor %}
+        </section>
+    {% else %}
+        <section class="rounded-3xl bg-white p-6 text-body shadow">
+            Модули пока не найдены.
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

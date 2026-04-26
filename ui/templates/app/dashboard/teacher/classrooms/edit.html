@@ -1,0 +1,39 @@
+{% extends 'layouts/teacher_layout.html' %}
+
+{% block title %}Редактировать класс{% endblock %}
+
+{% block dashboard_content %}
+<div class="grid gap-6">
+    <section class="rounded-3xl bg-neutral-primary p-6 shadow">
+        <h1 class="text-3xl font-black">Редактировать класс</h1>
+        <p class="mt-2 text-body">{{ classroom.name }}</p>
+    </section>
+
+    <section class="rounded-3xl bg-neutral-primary p-6 shadow">
+        <form method="post" class="max-w-xl">
+            {% csrf_token %}
+
+            <div class="grid gap-2">
+                <label class="font-semibold" for="{{ form.name.id_for_label }}">Название класса</label>
+                {{ form.name }}
+
+                {% if form.name.errors %}
+                    <div class="text-sm font-semibold text-danger">
+                        {{ form.name.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+                <button type="submit" class="rounded-2xl bg-brand px-5 py-3 font-semibold text-white shadow">
+                    Сохранить
+                </button>
+
+                <a href="{% url 'teacher:classrooms' %}" class="rounded-2xl bg-white px-5 py-3 font-semibold text-brand shadow">
+                    Назад
+                </a>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
