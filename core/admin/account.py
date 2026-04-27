@@ -1,10 +1,9 @@
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from unfold.admin import ModelAdmin as UFModelAdmin
-from unfold.forms import UserCreationForm
+from unfold.forms import UserCreationForm, AdminPasswordChangeForm
 from core.models import User
 from django.contrib.auth.models import Group
 
@@ -18,12 +17,13 @@ class UserAdmin(BaseUserAdmin, UFModelAdmin):
     list_filter = ('role', 'is_active', 'is_staff', 'is_superuser')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('id',)
-    readonly_fields = ('last_login', 'date_joined')
+    readonly_fields = ('last_login', 'date_joined', 'password_change_link')
     add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
 
     fieldsets = (
         (_('Основная информация'), {
-            'fields': ('username', 'password'),
+            'fields': ('username', 'password', 'password_change_link'),
         }),
         (_('Личная информация'), {
             'fields': ('first_name', 'last_name', 'email', 'role', 'avatar'),
@@ -68,6 +68,16 @@ class UserAdmin(BaseUserAdmin, UFModelAdmin):
             '/static/images/user-avatar.png'
         )
     avatar_preview.short_description = _('Аватар')
+
+    def password_change_link(self, obj):
+        if not obj or not obj.pk:
+            return '-'
+
+        return format_html(
+            '<a href="../password/" style="font-weight:600;color: #4f46e5;">{}</a>',
+            _('Изменить пароль'),
+        )
+    password_change_link.short_description = _('Смена пароля')
 
 
 admin.site.unregister(Group)

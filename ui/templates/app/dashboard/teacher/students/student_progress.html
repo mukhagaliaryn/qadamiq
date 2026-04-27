@@ -1,0 +1,202 @@
+{% extends 'layouts/teacher_layout.html' %}
+{% load static %}
+
+{% block title %}Прогресс ученика{% endblock %}
+
+{% block dashboard_content %}
+    <div class="space-y-6">
+
+        <section class="rounded-3xl bg-white p-6 border border-default">
+            <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                <div class="flex items-center gap-4">
+                    {% if student.avatar %}
+                        <img
+                            src="{{ student.avatar.url }}"
+                            alt="{{ student.full_name|default:student.username }}"
+                            class="h-20 w-20 rounded-3xl object-cover"
+                        >
+                    {% else %}
+                        <img
+                            src="{% static 'images/user-avatar.png' %}"
+                            alt="{{ student.full_name|default:student.username }}"
+                            class="h-20 w-20 rounded-3xl object-cover"
+                        >
+                    {% endif %}
+
+                    <div>
+                        <h1 class="text-3xl font-black text-heading">
+                            {{ student.full_name|default:student.username }}
+                        </h1>
+                        <p class="mt-1 text-body">
+                            {{ student.email|default:'Email не указан' }}
+                        </p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <span class="rounded-full bg-neutral-primary px-4 py-2 text-sm font-bold text-brand">
+                                @{{ student.username }}
+                            </span>
+
+                            {% for classroom in classrooms %}
+                                <span class="rounded-full bg-neutral-primary px-4 py-2 text-sm font-bold text-heading">
+                                    {{ classroom.name }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <a
+                    href="{% url 'teacher:students' %}"
+                    class="inline-flex items-center justify-center rounded-2xl bg-neutral-primary px-5 py-3 font-bold text-heading transition hover:bg-brand hover:text-white"
+                >
+                    Назад
+                </a>
+            </div>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-4">
+            <div class="rounded-3xl bg-white p-5 border border-default">
+                <div class="text-body">Предметы</div>
+                <div class="mt-2 text-3xl font-black text-heading">
+                    {{ subject_progresses|length }}
+                </div>
+            </div>
+
+            <div class="rounded-3xl bg-white p-5 border border-default">
+                <div class="text-body">Задания</div>
+                <div class="mt-2 text-3xl font-black text-heading">
+                    {{ task_progresses|length }}
+                </div>
+            </div>
+
+            <div class="rounded-3xl bg-white p-5 border border-default">
+                <div class="text-body">Завершено</div>
+                <div class="mt-2 text-3xl font-black text-heading">
+                    {{ completed_tasks_count|default:0 }}
+                </div>
+            </div>
+
+            <div class="rounded-3xl bg-white p-5 border border-default">
+                <div class="text-body">Попытки</div>
+                <div class="mt-2 text-3xl font-black text-heading">
+                    {{ attempts_count|default:0 }}
+                </div>
+            </div>
+        </section>
+
+        <section class="rounded-3xl bg-white p-6 border border-default">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-heading">Прогресс по предметам</h2>
+                    <p class="mt-1 text-body">Предметы, назначенные классам этого ученика.</p>
+                </div>
+            </div>
+
+            <div class="mt-5 space-y-3">
+                {% for progress in subject_progresses %}
+                    <div class="rounded-3xl bg-neutral-primary p-5">
+                        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <div class="text-xl font-black text-heading">
+                                    {{ progress.subject.title }}
+                                </div>
+                                <div class="mt-1 text-body">
+                                    {% if progress.is_completed %}
+                                        Завершён
+                                    {% elif progress.is_started %}
+                                        Начат
+                                    {% else %}
+                                        Не начат
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+                                {% if progress.is_started %}
+                                    <span class="rounded-full bg-white px-4 py-2 text-sm font-bold text-brand">
+                                        Начат
+                                    </span>
+                                {% endif %}
+
+                                {% if progress.is_completed %}
+                                    <span class="rounded-full bg-white px-4 py-2 text-sm font-bold text-success">
+                                        Завершён
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="rounded-3xl bg-neutral-primary p-5 text-body">
+                        По предметам пока нет данных.
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="rounded-3xl bg-white p-6 border border-default">
+            <h2 class="text-2xl font-black text-heading">Задания</h2>
+            <p class="mt-1 text-body">
+                Детальная история выполнения заданий.
+            </p>
+
+            <div class="mt-5 overflow-hidden rounded-3xl border border-default">
+                <table class="w-full min-w-[900px] bg-white text-left">
+                    <thead class="bg-neutral-primary">
+                        <tr>
+                            <th class="px-4 py-4 font-black text-heading">Задание</th>
+                            <th class="px-4 py-4 font-black text-heading">Предмет</th>
+                            <th class="px-4 py-4 font-black text-heading">Модуль</th>
+                            <th class="px-4 py-4 font-black text-heading">Уровень</th>
+                            <th class="px-4 py-4 font-black text-heading">Статус</th>
+                            <th class="px-4 py-4 font-black text-heading">Попытки</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for progress in task_progresses %}
+                            <tr class="border-t border-black/5 transition hover:bg-neutral-primary">
+                                <td class="px-4 py-4">
+                                    <div class="font-bold text-heading">
+                                        {{ progress.task.title }}
+                                    </div>
+                                    <div class="mt-1 text-sm text-body">
+                                        {{ progress.task.get_task_type_display }}
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-4 text-body">
+                                    {{ progress.task.level.module.subject.title }}
+                                </td>
+
+                                <td class="px-4 py-4 text-body">
+                                    {{ progress.task.level.module.title }}
+                                </td>
+
+                                <td class="px-4 py-4 text-body">
+                                    {{ progress.task.level.title }}
+                                </td>
+
+                                <td class="px-4 py-4">
+                                    <span class="rounded-full bg-neutral-primary px-3 py-1 text-sm font-bold text-heading">
+                                        {{ progress.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td class="px-4 py-4 font-bold text-heading">
+                                    {{ progress.attempts_count }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-body">
+                                    Пока нет данных по заданиям.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}

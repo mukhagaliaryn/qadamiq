@@ -4,7 +4,7 @@ from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from core.decorators import role_required
-from core.models import Classroom, ClassroomSubject, TaskProgress, User
+from core.models import Classroom, ClassroomSubject, TaskProgress, User, SubjectProgress
 from .forms import ClassroomCreateForm, ClassroomStudentsAttachForm, ClassroomSubjectAssignForm, ClassroomUpdateForm
 
 
@@ -100,6 +100,50 @@ def students_view(request):
         'classrooms': classrooms,
         'selected_classroom': selected_classroom,
     })
+
+
+@login_required
+@role_required('teacher')
+def student_progress_view(request, student_id):
+    student = get_object_or_404(
+        User,
+        id=student_id,
+        role=User.Role.LEARNER,
+        classrooms__teacher=request.user,
+    )
+
+    classrooms = Classroom.objects.filter(
+        teacher=request.user,
+        students=student,
+    ).prefetch_related(
+        'classroom_subjects__subject',
+    )
+
+    subject_progresses = SubjectProgress.objects.filter(
+        learner=student,
+        subject__classroom_subjects__classroom__in=classrooms,
+    ).select_related(
+        'subject',
+    ).distinct()
+
+    task_progresses = TaskProgress.objects.filter(
+        learner=student,
+        task__level__module__subject__classroom_subjects__classroom__in=classrooms,
+    ).select_related(
+        'task',
+        'task__level',
+        'task__level__module',
+        'task__level__module__subject',
+    ).distinct()
+
+    context = {
+        'student': student,
+        'classrooms': classrooms,
+        'subject_progresses': subject_progresses,
+        'task_progresses': task_progresses,
+    }
+
+    return render(request, 'app/dashboard/teacher/students/student_progress.html', context)
 
 
 @login_required

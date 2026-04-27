@@ -84,33 +84,41 @@
                                     </div>
                                 </td>
 
-                                <td class="px-4 py-4 text-right">
-                                    {% if selected_classroom %}
-                                        <form
-                                            method="post"
-                                            action="{% url 'teacher:classroom-student-remove' selected_classroom.id student.id %}"
-                                            onsubmit="return confirm('Оқушыны осы сыныптан шығарасыз ба?')"
+                                <td class="px-4 py-4">
+                                    <div class="flex justify-end gap-2">
+                                        <a
+                                            href="{% url 'teacher:student-progress' student.id %}"
+                                            class="inline-flex items-center gap-1 rounded-2xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
                                         >
-                                            {% csrf_token %}
-                                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-
-                                            <button
-                                                type="submit"
-                                                class="flex gap-1 items-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-danger shadow-sm transition hover:bg-danger hover:text-white"
+                                            <span>Қарау</span>
+                                        </a>
+                                        {% if selected_classroom %}
+                                            <form
+                                                method="post"
+                                                action="{% url 'teacher:classroom-student-remove' selected_classroom.id student.id %}"
+                                                onsubmit="return confirm('Оқушыны осы сыныптан шығарасыз ба?')"
                                             >
-                                                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                                                    height="24" fill="none" viewBox="0 0 24 24">
-                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                                </svg>
-                                                <span>Удалить</span>
-                                            </button>
-                                        </form>
-                                    {% else %}
-                                        <span class="text-sm text-body">
-                                            Выберите класса
-                                        </span>
-                                    {% endif %}
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                                                <button
+                                                    type="submit"
+                                                    class="flex gap-1 items-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-danger shadow-sm transition hover:bg-danger hover:text-white"
+                                                >
+                                                    <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" fill="none" viewBox="0 0 24 24">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
+                                                    </svg>
+                                                    <span>Удалить</span>
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-sm text-body">
+                                                Выберите класса
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}

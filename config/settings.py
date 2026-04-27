@@ -237,12 +237,12 @@ UNFOLD = {
                     },
                     {
                         'title': _('Учебные классы'),
-                        'icon': 'user_attributes',
+                        'icon': 'jamboard_kiosk',
                         'link': reverse_lazy('admin:core_classroom_changelist'),
                     },
                     {
                         'title': _('Предметы классов'),
-                        'icon': 'user_attributes',
+                        'icon': 'cast_for_education',
                         'link': reverse_lazy('admin:core_classroomsubject_changelist'),
                     },
                     # ...
@@ -265,7 +265,7 @@ UNFOLD = {
                     },
                     {
                         'title': _('Задании'),
-                        'icon': 'task',
+                        'icon': 'assignment',
                         'link': reverse_lazy('admin:core_task_changelist'),
                     },
                     # ...
@@ -288,12 +288,12 @@ UNFOLD = {
                     },
                     {
                         'title': _('Прогресс по уровню'),
-                        'icon': 'checklist',
+                        'icon': 'chart_data',
                         'link': reverse_lazy('admin:core_levelprogress_changelist'),
                     },
                     {
                         'title': _('Прогресс по заданию'),
-                        'icon': 'checklist',
+                        'icon': 'checklist_rtl',
                         'link': reverse_lazy('admin:core_taskprogress_changelist'),
                     },
                     {
