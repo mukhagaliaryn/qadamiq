@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import dashboard, modules, levels, tasks
+from .views import dashboard, modules, levels, tasks, tutor
 
 app_name = 'learner'
 
@@ -9,4 +9,5 @@ urlpatterns = [
     path('modules/<int:module_id>/', modules.module_detail_view, name='module-detail'),
     path('levels/<int:level_id>/', levels.level_detail_view, name='level-detail'),
     path('tasks/<int:task_id>/', tasks.task_detail_view, name='task-detail'),
+    path('tasks/<int:task_id>/tutor/', tutor.tutor_view, name='task-tutor'),
 ]

@@ -23,6 +23,10 @@ from .progress import (
     TaskProgress,
     AudioSubmission,
 )
+from .tutor import (
+    TutorConversation,
+    TutorMessage,
+)
 
 __all__ = [
     'User',
@@ -47,4 +51,6 @@ __all__ = [
     'LevelProgress',
     'TaskProgress',
     'AudioSubmission',
+    'TutorConversation',
+    'TutorMessage',
 ]

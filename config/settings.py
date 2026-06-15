@@ -165,6 +165,12 @@ LOGIN_REDIRECT_URL = 'main:post-auth-redirect'
 LOGOUT_REDIRECT_URL = 'main:home'
 
 
+# AI Tutor settings (OpenAI)
+# ----------------------------------------------------------------------------------------------------------------------
+OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+TUTOR_OPENAI_MODEL = config('TUTOR_OPENAI_MODEL', default='gpt-4o-mini')
+
+
 # Unfold settings
 # ----------------------------------------------------------------------------------------------------------------------
 UNFOLD = {

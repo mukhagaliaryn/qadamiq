@@ -13,6 +13,7 @@ develop-eggs/
 #dist/
 downloads/
 media/
+backups/
 node_modules/
 eggs/
 .eggs/

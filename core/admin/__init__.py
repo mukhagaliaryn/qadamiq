@@ -21,3 +21,6 @@ from .progress import (
     TaskProgressAdmin,
     AudioSubmissionAdmin,
 )
+from .tutor import (
+    TutorConversationAdmin,
+)
